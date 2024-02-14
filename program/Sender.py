@@ -43,7 +43,7 @@ class Sender(Program):
         
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('-dst', '--destination', type=str, default="")
+    argparser.add_argument('-p', '--peer', type=str, default="")
     argparser.add_argument('-t', '--topic', type=str, default="job/packet")
     argparser.add_argument('-g', '--sleep_gap', type=float, default="0.1")
     argparser.add_argument('-s', '--size', type=int, default="100")
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     
     pub_configs = [
         {
-            "ip": args.destination, 
+            "ip": args.peers, 
             "port": 1883,
         }
     ]
