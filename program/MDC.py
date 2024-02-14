@@ -12,9 +12,10 @@ import pickle
 
 
 class MDC(Program):
-    def __init__(self, sub_config, pub_configs):
+    def __init__(self, sub_config, pub_configs, address):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
+        self.address = address
 
         self.topic_dispatcher = {
             "job/dnn_output": self.handle_dnn_output_in,
@@ -33,11 +34,16 @@ class MDC(Program):
 
         dummy_job = pickle.loads(data)
 
-        publisher.publish('hardware/server/car_recog/out/from', f'{now}/{car_num}')
+        if dummy_job.is_destination(self.address):
+            print(dummy_job.calc_latency())
+        else:
+            dummy_job_bytes = pickle.dumps(dummy_job)
+            self.publisher[0].publish('job/packet', dummy_job_bytes)
         
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
-    argparser.add_argument('-dst', '--destination', type=str, default="")
+    argparser.add_argument('-p', '--peer', type=str, default="")
+    argparser.add_argument('-a', '--address', type=str, default="")
     argparser.add_argument('-t', '--topic', type=str, default="job/packet")
     args = argparser.parse_args()
 
@@ -56,5 +62,5 @@ if __name__ == '__main__':
         }
     ]
     
-    ex = MDC(sub_config=sub_config, pub_configs=pub_configs)
+    ex = MDC(sub_config=sub_config, pub_configs=pub_configs, address=args.address)
     ex.start()
