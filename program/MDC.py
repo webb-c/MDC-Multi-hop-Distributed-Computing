@@ -57,7 +57,7 @@ if __name__ == '__main__':
     
     pub_configs = [
         {
-            "ip": args.destination, 
+            "ip": args.peer, 
             "port": 1883,
         }
     ]
