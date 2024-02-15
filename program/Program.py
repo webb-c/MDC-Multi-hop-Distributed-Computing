@@ -35,7 +35,7 @@ class Program:
             message = self.queue.get()  
             if message:
                 callback = self.topic_dispatcher.get(message.topic, self.handle_unknown_topic)
-                callback_thread = Thread(target=callback, args=(message.topic, message.payload.decode('utf8'), self.publisher, ))
+                callback_thread = Thread(target=callback, args=(message.topic, message.payload, self.publisher, ))
                 callback_thread.start()
 
     def handle_unknown_topic(self, topic, data, publisher):

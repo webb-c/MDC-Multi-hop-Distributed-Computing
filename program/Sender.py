@@ -35,9 +35,9 @@ class Sender(Program):
 
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
-    def send_dummy_job(self, data, sleep_time, iterate_time):
+    def send_dummy_job(self, data, sleep_time, iterate_time, dst):
         for _ in range(iterate_time):
-            dummy_job = Job(data)
+            dummy_job = Job(data, dst)
             dummy_job_bytes = pickle.dumps(dummy_job)
             self.publisher[0].publish("job/packet", dummy_job_bytes)
 
@@ -69,4 +69,4 @@ if __name__ == '__main__':
     ]
     
     sender = Sender(sub_config=sub_config, pub_configs=pub_configs)
-    sender.send_dummy_job("0"*args.size, args.sleep_gap, args.iterate)
+    sender.send_dummy_job("0"*args.size, args.sleep_gap, args.iterate, "192.168.1.6")

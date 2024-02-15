@@ -31,7 +31,6 @@ class MDC(Program):
         pass
 
     def handle_packet_in(self, topic, data, publisher):
-
         dummy_job = pickle.loads(data)
 
         if dummy_job.is_destination(self.address):

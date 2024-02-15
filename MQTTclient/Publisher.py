@@ -26,7 +26,10 @@ class Publisher:
         print(str(rc))
 
     def publish(self, topic, message):
-        self.client.publish(topic, message.encode('utf8'))
+        if isinstance(message, bytes):
+            self.client.publish(topic, message)
+        else:
+            self.client.publish(topic, message.encode('utf8'))
 
     
 
