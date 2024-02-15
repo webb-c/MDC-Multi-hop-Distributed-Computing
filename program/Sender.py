@@ -30,6 +30,9 @@ class Sender(Program):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
 
+        self.topic_dispatcher = {
+        }
+
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
     def send_dummy_job(self, data, sleep_time, iterate_time):
