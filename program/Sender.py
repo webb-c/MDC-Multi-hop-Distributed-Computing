@@ -47,6 +47,7 @@ class Sender(Program):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-p', '--peer', type=str, default="")
+    argparser.add_argument('-d', '--destination', type=str, default="192.168.1.7")
     argparser.add_argument('-t', '--topic', type=str, default="job/packet")
     argparser.add_argument('-g', '--sleep_gap', type=float, default="0.1")
     argparser.add_argument('-s', '--size', type=int, default="100")
@@ -69,4 +70,4 @@ if __name__ == '__main__':
     ]
     
     sender = Sender(sub_config=sub_config, pub_configs=pub_configs)
-    sender.send_dummy_job("0"*args.size, args.sleep_gap, args.iterate, "192.168.1.6")
+    sender.send_dummy_job("0"*args.size, args.sleep_gap, args.iterate, args.destination)
