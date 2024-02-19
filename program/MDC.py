@@ -17,6 +17,7 @@ class MDC(Program):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
+        print(self.address)
 
         self.topic_dispatcher = {
             "job/dnn_output": self.handle_dnn_output_in,
