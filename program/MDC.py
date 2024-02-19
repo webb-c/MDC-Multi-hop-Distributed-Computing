@@ -11,6 +11,7 @@ import argparse
 import pickle
 
 from utils.utils import get_ip_address
+from routing_table.RoutingTable import RoutingTable
 import paho.mqtt.publish as publish
 
 class MDC(Program):
@@ -18,6 +19,7 @@ class MDC(Program):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
+        self.routing_table = RoutingTable(self.address)
         print(self.address)
 
         self.topic_dispatcher = {
@@ -36,14 +38,26 @@ class MDC(Program):
     def handle_packet_in(self, topic, data, publisher):
         dummy_job = pickle.loads(data)
 
-        if dummy_job.is_destination(self.address):
-            # response to source
-            dummy_job.remove_input()
-            dummy_job_bytes = pickle.dumps(dummy_job)
-            publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.source)
-        
-        elif dummy_job.is_source(self.address):
+        if dummy_job.is_rtt_destination(self.address):
             print(dummy_job.calc_latency())
+            # TODO change to save results.
+
+        elif dummy_job.is_destination(self.address):
+            # response to source
+            job_id = dummy_job.get_id()
+            print(job_id)
+            if self.routing_table.exist_rule(job_id): # if it is mid dst
+                destination = self.routing_table.find_rule(job_id)
+                dummy_job.set_source(self.address)
+                dummy_job.set_destination(destination)
+                dummy_job_bytes = pickle.dumps(dummy_job)
+                publish.single('job/packet', dummy_job_bytes, hostname=destination)
+
+            else: # if it is final dst
+                dummy_job.remove_input()
+                dummy_job.set_response()
+                dummy_job_bytes = pickle.dumps(dummy_job)
+                publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.source)
 
         else:
             dummy_job_bytes = pickle.dumps(dummy_job)
