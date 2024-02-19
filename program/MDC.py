@@ -58,7 +58,7 @@ class MDC(Program):
                 dummy_job.set_destination(dummy_job.source)
                 dummy_job.set_source(self.address)
                 dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.source)
+                publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.destination)
 
         else:
             dummy_job_bytes = pickle.dumps(dummy_job)
