@@ -1,4 +1,6 @@
+import subprocess
 import socket
+import re
 import os
 
 def get_ip_address(interface_name='eth0'):
@@ -15,10 +17,15 @@ def get_ip_address_windows(interface_name='eth0'):
     return ip_address
 
 def get_ip_address_linux(interface_name='eth0'):
-    # 리눅스에서는 인터페이스 이름으로 IP 주소를 조회합니다.
+    # 리눅스에서 ip addr 명령어를 사용하여 IP 주소를 찾습니다.
     try:
-        with open(f'/sys/class/net/{interface_name}/address', 'r') as f:
-            ip_address = f.read().strip()
-        return ip_address
-    except FileNotFoundError:
-        return "Interface not found"
+        ip_addr_output = subprocess.check_output(["ip", "addr", "show", interface_name], encoding='utf-8')
+        # inet으로 시작하는 줄에서 IP 주소를 찾기 위한 정규 표현식
+        ip_pattern = re.compile(r"inet (\d+\.\d+\.\d+\.\d+)/")
+        ip_match = ip_pattern.search(ip_addr_output)
+        if ip_match:
+            return ip_match.group(1)
+        else:
+            return "IP address not found"
+    except subprocess.CalledProcessError:
+        return "Failed to execute ip command or interface not found"
