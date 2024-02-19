@@ -22,3 +22,6 @@ class RoutingTable:
             return self.rules[id]
         else:
             raise Exception("No flow rules : ", id)
+        
+    def __str__(self):
+        return str(self.rules)

@@ -45,7 +45,6 @@ class MDC(Program):
         elif dummy_job.is_destination(self.address):
             # response to source
             job_id = dummy_job.get_id()
-            print(job_id)
             if self.routing_table.exist_rule(job_id): # if it is mid dst
                 destination = self.routing_table.find_rule(job_id)
                 dummy_job.set_source(self.address)
@@ -56,6 +55,8 @@ class MDC(Program):
             else: # if it is final dst
                 dummy_job.remove_input()
                 dummy_job.set_response()
+                dummy_job.set_destination(dummy_job.source)
+                dummy_job.set_source(self.address)
                 dummy_job_bytes = pickle.dumps(dummy_job)
                 publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.source)
 
