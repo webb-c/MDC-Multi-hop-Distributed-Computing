@@ -14,7 +14,7 @@ from utils.utils import get_ip_address
 import MQTTclient
 
 class MDC(Program):
-    def __init__(self, sub_config, pub_configs, address):
+    def __init__(self, sub_config, pub_configs):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
@@ -77,5 +77,5 @@ if __name__ == '__main__':
         }
     ]
     
-    ex = MDC(sub_config=sub_config, pub_configs=pub_configs, address=args.address)
+    ex = MDC(sub_config=sub_config, pub_configs=pub_configs)
     ex.start()
