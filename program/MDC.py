@@ -11,7 +11,7 @@ import argparse
 import pickle
 
 from utils.utils import get_ip_address
-import MQTTclient
+import paho.mqtt.publish as publish
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs):
@@ -38,16 +38,9 @@ class MDC(Program):
 
         if dummy_job.is_destination(self.address):
             # response to source
-            response_pub_config = {
-                "ip": dummy_job.source, 
-                "port": 1883,
-            }
-            response_publisher = MQTTclient.Publisher(config=response_pub_config)
-
             dummy_job.remove_input()
             dummy_job_bytes = pickle.dumps(dummy_job)
-            response_publisher.publish('job/packet', dummy_job_bytes)
-
+            publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.source)
         
         elif dummy_job.is_source(self.address):
             print(dummy_job.calc_latency())
