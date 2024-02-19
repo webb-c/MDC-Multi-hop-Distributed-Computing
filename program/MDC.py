@@ -10,12 +10,13 @@ from datetime import datetime
 import argparse
 import pickle
 
+from utils.utils import get_ip_address
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs, address):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
-        self.address = address
+        self.address = get_ip_address("eth0")
 
         self.topic_dispatcher = {
             "job/dnn_output": self.handle_dnn_output_in,
