@@ -5,7 +5,7 @@ class RoutingTable:
 
         if self.address == "192.168.1.6":
             # {id}-{is_response}
-            self.add_rule("test-False", "192.168.1.6")
+            self.add_rule("test-False", "192.168.1.5")
             self.add_rule("test-True", "192.168.1.7")
 
     def exist_rule(self, id):
