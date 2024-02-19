@@ -9,6 +9,8 @@ import argparse
 import pickle
 import time
 
+from utils.utils import get_ip_address
+
 """
 
 고쳐야할 것:
@@ -29,6 +31,7 @@ class Sender(Program):
     def __init__(self, sub_config, pub_configs):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
+        self.address = get_ip_address("eth0")
 
         self.topic_dispatcher = {
         }
@@ -37,7 +40,7 @@ class Sender(Program):
 
     def send_dummy_job(self, data, sleep_time, iterate_time, dst):
         for _ in range(iterate_time):
-            dummy_job = Job(data, dst)
+            dummy_job = Job(data, self.address, dst)
             dummy_job_bytes = pickle.dumps(dummy_job)
             self.publisher[0].publish("job/packet", dummy_job_bytes)
 

@@ -11,6 +11,7 @@ import argparse
 import pickle
 
 from utils.utils import get_ip_address
+import MQTTclient
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs, address):
@@ -36,7 +37,21 @@ class MDC(Program):
         dummy_job = pickle.loads(data)
 
         if dummy_job.is_destination(self.address):
+            # response to source
+            response_pub_config = {
+                "ip": dummy_job.source, 
+                "port": 1883,
+            }
+            response_publisher = MQTTclient.Publisher(config=response_pub_config)
+
+            dummy_job.remove_input()
+            dummy_job_bytes = pickle.dumps(dummy_job)
+            response_publisher.publish('job/packet', dummy_job_bytes)
+
+        
+        elif dummy_job.is_source(self.address):
             print(dummy_job.calc_latency())
+
         else:
             dummy_job_bytes = pickle.dumps(dummy_job)
             self.publisher[0].publish('job/packet', dummy_job_bytes)
@@ -44,7 +59,6 @@ class MDC(Program):
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-p', '--peer', type=str, default="")
-    argparser.add_argument('-a', '--address', type=str, default="")
     argparser.add_argument('-t', '--topic', type=str, default="job/packet")
     args = argparser.parse_args()
 
