@@ -2,6 +2,7 @@ import MQTTclient
 
 from queue import Queue
 from threading import Thread
+from pyprnt import prnt
 
 class Program:
 
@@ -15,19 +16,26 @@ class Program:
 
         self.subscriber = None
         self.publisher = []
+        self.processor_thread = None
 
         self.init_subscriber()
         self.init_publisher()
+        self.init_processor()
 
-        processor_thread = Thread(target=self.message_processor)
-        processor_thread.start()
+        prnt({"sub_config" : sub_config, "pub_configs" : pub_configs})
     
     def init_subscriber(self):
-        self.subscriber = MQTTclient.Subscriber(config=self.sub_config, queue=self.queue)
+        if self.sub_config != None:
+            self.subscriber = MQTTclient.Subscriber(config=self.sub_config, queue=self.queue)
 
     def init_publisher(self):
         for config in self.pub_configs:
             self.publisher.append(MQTTclient.Publisher(config=config))
+
+    def init_processor(self):
+        if self.sub_config != None:
+            self.processor_thread = Thread(target=self.message_processor)
+            self.processor_thread.start()
 
     def message_processor(self):
         while True:

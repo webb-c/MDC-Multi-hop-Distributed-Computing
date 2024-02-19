@@ -42,7 +42,6 @@ class Sender(Program):
             self.publisher[0].publish("job/packet", dummy_job_bytes)
 
             time.sleep(sleep_time)
-
         
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
@@ -54,14 +53,7 @@ if __name__ == '__main__':
     argparser.add_argument('-i', '--iterate', type=int, default="100")
     args = argparser.parse_args()
 
-    sub_config = {
-            "ip": "127.0.0.1", 
-            "port": 1883,
-            "topics": [
-                (args.topic, 0),
-            ],
-        }
-    
+    sub_config = None
     pub_configs = [
         {
             "ip": args.peer, 
