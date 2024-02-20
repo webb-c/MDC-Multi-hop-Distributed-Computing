@@ -1,7 +1,7 @@
 import time
 
 class Job:
-    def __init__(self, input, source, destination, id):
+    def __init__(self, input, source, destination, id, info):
         self.input = input
         self.output = None
         self.source = source
@@ -11,6 +11,7 @@ class Job:
         self.response = False
         self.id = id
         self.delimeter = "-"
+        self.info = info
     
     def run(self):
         self.output = self.input
@@ -41,6 +42,8 @@ class Job:
     
     def calc_latency(self):
         cur_time = time.time_ns()
+        print("cur_time", cur_time)
+        print("start_time", self.start_time)
         return (cur_time - self.start_time) / 1_000_000 # ms
     
     def remove_input(self):

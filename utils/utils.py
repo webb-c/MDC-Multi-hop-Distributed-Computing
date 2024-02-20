@@ -2,6 +2,7 @@ import subprocess
 import socket
 import re
 import os
+import csv
 
 def get_ip_address(interface_name='eth0'):
     # 운영 체제 확인
@@ -29,3 +30,20 @@ def get_ip_address_linux(interface_name='eth0'):
             return "IP address not found"
     except subprocess.CalledProcessError:
         return "Failed to execute ip command or interface not found"
+    
+
+def save_latency(file_name, latency):
+    file_path = f"results/{file_name}.csv"
+    # 파일이 존재하는지 확인
+    file_exists = os.path.exists(file_path)
+
+    # 파일에 데이터 쓰기
+    with open(file_path, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        
+        # 파일이 새로 만들어진 경우 열 이름을 씁니다.
+        if not file_exists:
+            writer.writerow(['latency'])
+        
+        # 데이터 행을 파일에 씁니다.
+        writer.writerow([latency])

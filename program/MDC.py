@@ -10,7 +10,7 @@ from datetime import datetime
 import argparse
 import pickle
 
-from utils.utils import get_ip_address
+from utils.utils import get_ip_address, save_latency
 from routing_table.RoutingTable import RoutingTable
 import paho.mqtt.publish as publish
 
@@ -39,7 +39,10 @@ class MDC(Program):
         dummy_job = pickle.loads(data)
 
         if dummy_job.is_rtt_destination(self.address):
-            print(dummy_job.calc_latency())
+            file_name = dummy_job.info
+            latency = dummy_job.calc_latency()
+            print(latency)
+            save_latency(file_name, latency)
             # TODO change to save results.
 
         elif dummy_job.is_destination(self.address):
