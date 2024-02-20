@@ -41,9 +41,8 @@ class Job:
         return self.start_time
     
     def calc_latency(self):
+        time.sleep(0.00000001) # cpu time
         cur_time = time.time_ns()
-        print("cur_time", cur_time)
-        print("start_time", self.start_time)
         return (cur_time - self.start_time) / 1_000_000 # ms
     
     def remove_input(self):
