@@ -28,14 +28,15 @@ def callback_example(topic, data, publisher):
 """
 
 class Sender(Program):
-    def __init__(self, sub_config, pub_configs, job):
+    def __init__(self, sub_config, pub_configs, topic):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
+        self.topic = topic
         self.address = get_ip_address("eth0")
 
-        if job == "packet":
+        if "packet" in self.topic:
             self.job = Job
-        elif job == "dnn_output":
+        elif "dnn_output" in self.topic:
             self.job = DNNJob
 
         self.topic_dispatcher = {
@@ -49,7 +50,7 @@ class Sender(Program):
         for _ in range(iterate_time):
             dummy_job = self.job(data, self.address, dst, id, info)
             dummy_job_bytes = pickle.dumps(dummy_job)
-            self.publisher[0].publish("job/packet", dummy_job_bytes)
+            self.publisher[0].publish(self.topic, dummy_job_bytes)
 
             time.sleep(sleep_time)
         
@@ -73,5 +74,5 @@ if __name__ == '__main__':
         }
     ]
     
-    sender = Sender(sub_config=sub_config, pub_configs=pub_configs)
+    sender = Sender(sub_config=sub_config, pub_configs=pub_configs, topic=args.topic)
     sender.send_dummy_job(args.size, args.sleep_gap / 1000, args.iterate, args.destination, args.id, args.mode)

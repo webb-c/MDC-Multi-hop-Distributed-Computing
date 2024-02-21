@@ -15,11 +15,12 @@ from routing_table.RoutingTable import RoutingTable
 import paho.mqtt.publish as publish
 
 class MDC(Program):
-    def __init__(self, sub_config, pub_configs, job):
+    def __init__(self, sub_config, pub_configs, topic):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
         self.routing_table = RoutingTable(self.address)
+        self.topic = topic
         print(self.address)
 
         self.topic_dispatcher = {
@@ -52,7 +53,7 @@ class MDC(Program):
                 dummy_job.set_source(self.address)
                 dummy_job.set_destination(destination)
                 dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single('job/packet', dummy_job_bytes, hostname=destination)
+                publish.single(self.topic, dummy_job_bytes, hostname=destination)
 
             else: # if it is final dst
                 dummy_job.remove_input()
@@ -60,11 +61,11 @@ class MDC(Program):
                 dummy_job.set_destination(dummy_job.source)
                 dummy_job.set_source(self.address)
                 dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single('job/packet', dummy_job_bytes, hostname=dummy_job.destination)
+                publish.single(self.topic, dummy_job_bytes, hostname=dummy_job.destination)
 
         else:
             dummy_job_bytes = pickle.dumps(dummy_job)
-            self.publisher[0].publish('job/packet', dummy_job_bytes)
+            self.publisher[0].publish(self.topic, dummy_job_bytes)
         
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser()
@@ -87,5 +88,5 @@ if __name__ == '__main__':
         }
     ]
     
-    ex = MDC(sub_config=sub_config, pub_configs=pub_configs)
+    ex = MDC(sub_config=sub_config, pub_configs=pub_configs, topic=args.topic)
     ex.start()
