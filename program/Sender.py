@@ -3,7 +3,8 @@ import sys, os, json
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from program import Program
-from job import Job, DNNJob
+from job.Job import Job
+from job.DNNJob import DNNJob
 
 import argparse
 import pickle

@@ -38,6 +38,7 @@ class MDC(Program):
 
     def handle_packet_in(self, topic, data, publisher):
         dummy_job = pickle.loads(data)
+        print(dummy_job)
 
         if dummy_job.is_rtt_destination(self.address):
             file_name = dummy_job.info
