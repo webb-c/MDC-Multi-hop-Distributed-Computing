@@ -3,7 +3,7 @@ import sys, os, json
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from program import Program
-from job import Job
+from job import Job, DNNJob
 
 import argparse
 import pickle
@@ -28,10 +28,15 @@ def callback_example(topic, data, publisher):
 """
 
 class Sender(Program):
-    def __init__(self, sub_config, pub_configs):
+    def __init__(self, sub_config, pub_configs, job):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
+
+        if job == "packet":
+            self.job = Job
+        elif job == "dnn_output":
+            self.job = DNNJob
 
         self.topic_dispatcher = {
         }
@@ -42,7 +47,7 @@ class Sender(Program):
         info = f"sleep_time_{sleep_time}_size_{size}_it_{iterate_time}_mode_{ex_mode}"
         data = "0" * size
         for _ in range(iterate_time):
-            dummy_job = Job(data, self.address, dst, id, info)
+            dummy_job = self.job(data, self.address, dst, id, info)
             dummy_job_bytes = pickle.dumps(dummy_job)
             self.publisher[0].publish("job/packet", dummy_job_bytes)
 

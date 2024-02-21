@@ -15,7 +15,7 @@ from routing_table.RoutingTable import RoutingTable
 import paho.mqtt.publish as publish
 
 class MDC(Program):
-    def __init__(self, sub_config, pub_configs):
+    def __init__(self, sub_config, pub_configs, job):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
         self.address = get_ip_address("eth0")
