@@ -41,7 +41,6 @@ class MDC(Program):
         if dummy_job.is_rtt_destination(self.address):
             file_name = dummy_job.info
             latency = dummy_job.calc_latency()
-            print(latency)
             save_latency(file_name, latency)
             # TODO change to save results.
 
