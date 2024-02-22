@@ -11,4 +11,4 @@ class DNNJob(Job):
         self.model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
 
     def run(self):
-        self.model(input)
+        self.model(self.input)
