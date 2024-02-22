@@ -34,7 +34,37 @@ class MDC(Program):
         pass
 
     def handle_dnn_output_in(self, topic, data, publisher):
-        pass
+        dummy_job = pickle.loads(data)
+        print(dummy_job)
+
+        if dummy_job.is_rtt_destination(self.address):
+            file_name = dummy_job.info
+            latency = dummy_job.calc_latency()
+            save_latency(file_name, latency)
+            # TODO change to save results.
+
+        elif dummy_job.is_destination(self.address):
+            # response to source
+            job_id = dummy_job.get_id()
+            if self.routing_table.exist_rule(job_id): # if it is mid dst
+                destination = self.routing_table.find_rule(job_id)
+                dummy_job.set_source(self.address)
+                dummy_job.set_destination(destination)
+                dummy_job_bytes = pickle.dumps(dummy_job)
+                publish.single(self.topic, dummy_job_bytes, hostname=destination)
+
+            else: # if it is final dst
+                dummy_job.run()
+                dummy_job.remove_input()
+                dummy_job.set_response()
+                dummy_job.set_destination(dummy_job.source)
+                dummy_job.set_source(self.address)
+                dummy_job_bytes = pickle.dumps(dummy_job)
+                publish.single(self.topic, dummy_job_bytes, hostname=dummy_job.destination)
+
+        else:
+            dummy_job_bytes = pickle.dumps(dummy_job)
+            self.publisher[0].publish(self.topic, dummy_job_bytes)
 
     def handle_packet_in(self, topic, data, publisher):
         dummy_job = pickle.loads(data)
