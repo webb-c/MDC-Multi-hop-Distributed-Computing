@@ -12,9 +12,7 @@ class Job:
         self.id = id
         self.delimeter = "-"
         self.info = info
-    
-    def run(self):
-        self.output = self.input
+        self.type = "packet"
 
     def get_output(self):
         return self.output

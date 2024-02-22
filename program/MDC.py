@@ -13,6 +13,7 @@ import pickle
 from utils.utils import get_ip_address, save_latency
 from routing_table.RoutingTable import RoutingTable
 import paho.mqtt.publish as publish
+from job.JobManager import JobManager
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs, topic):
@@ -21,6 +22,7 @@ class MDC(Program):
         self.address = get_ip_address("eth0")
         self.routing_table = RoutingTable(self.address)
         self.topic = topic
+        self.job_manager = JobManager()
         print(self.address)
 
         self.topic_dispatcher = {
@@ -54,7 +56,7 @@ class MDC(Program):
                 publish.single(self.topic, dummy_job_bytes, hostname=destination)
 
             else: # if it is final dst
-                dummy_job.run()
+                dummy_job = self.job_manager.run(dummy_job)
                 dummy_job.remove_input()
                 dummy_job.set_response()
                 dummy_job.set_destination(dummy_job.source)
