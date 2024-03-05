@@ -48,7 +48,6 @@ class Program:
                 # callback(message.topic, message.payload, self.publisher)
 
     def handle_unknown_topic(self, topic, data, publisher):
-        # 알 수 없는 토픽 처리 로직
         print(f"Received message from unknown topic {topic}: {data}")
 
     

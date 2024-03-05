@@ -12,22 +12,6 @@ import time
 
 from utils.utils import get_ip_address
 
-"""
-
-고쳐야할 것:
-  - ProgramExample - start
-  - config
-  - topic_dispathcer
-
-
-def callback_example(topic, data, publisher):
-    print(f"topic: {topic}")
-    print(f"data: {data}")
-
---> 이런 식으로 (topic, data, publisher)를 무조건 받아야함.
-
-"""
-
 class Sender(Program):
     def __init__(self, sub_config, pub_configs, topic):
         self.sub_config = sub_config
