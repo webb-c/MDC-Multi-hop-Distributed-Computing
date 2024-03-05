@@ -34,6 +34,7 @@ class Sender(Program):
         self.pub_configs = pub_configs
         self.topic = topic
         self.address = get_ip_address("eth0")
+        self.a = 0
 
         if "packet" in self.topic:
             self.job = Job
@@ -46,12 +47,14 @@ class Sender(Program):
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
     def send_dummy_job(self, size, sleep_time, iterate_time, dst, id, ex_mode):
-        info = f"sleep_time_{sleep_time}_size_{size}_it_{iterate_time}_mode_{ex_mode}"
+        info = f"sleeptime_{sleep_time}_size_{size}_it_{iterate_time}_mode_{ex_mode}"
         data = "0" * size
         for _ in range(iterate_time):
-            dummy_job = self.job(data, self.address, dst, id, info)
+            dummy_job = self.job(data, self.address, dst, id, info, self.a)
+            self.a += 1
             dummy_job_bytes = pickle.dumps(dummy_job)
             self.publisher[0].publish(self.topic, dummy_job_bytes)
+            print("send", self.a)
 
             time.sleep(sleep_time)
         

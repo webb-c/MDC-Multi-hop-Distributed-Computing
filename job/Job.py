@@ -1,7 +1,7 @@
 import time
 
 class Job:
-    def __init__(self, input, source, destination, id, info):
+    def __init__(self, input, source, destination, id, info, num = -1):
         self.input = input
         self.output = None
         self.source = source
@@ -13,6 +13,7 @@ class Job:
         self.delimeter = "-"
         self.info = info
         self.type = "packet"
+        self.num = num
 
     def get_output(self):
         return self.output
