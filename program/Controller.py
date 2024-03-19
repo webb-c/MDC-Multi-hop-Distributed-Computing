@@ -39,10 +39,11 @@ class Controller(Program):
 
     def init_network_info(self):
         with open("config.json", 'r') as file:
-            self._network_info = json.load(file)
+            netork_info = NetworkInfo(json.load(file))
+            self._network_info = netork_info
 
     def init_path(self):
-        self._log_path = f"./results/{self._network_info.get_experiment_name}"
+        self._log_path = f"./results/{self._network_info.get_experiment_name()}"
         os.makedirs(self._log_path, exist_ok=True)
         
     def init_layered_graph(self):
@@ -54,8 +55,7 @@ class Controller(Program):
         ip = node_info.get_ip()
 
         # make NetworkInfo & NetworkInfo byte
-        network_info: NetworkInfo = NetworkInfo(self._network_info)
-        network_info_bytes = pickle.dumps(network_info)
+        network_info_bytes = pickle.dumps(self._network_info)
 
         # send NetworkInfo byte to source ip (response)
         publish.single("mdc/network_info", network_info_bytes, hostname=ip)
