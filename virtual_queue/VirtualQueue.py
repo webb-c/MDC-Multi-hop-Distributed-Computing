@@ -4,12 +4,12 @@ from job import DNNSubtask
 class VirtualQueue:
     def __init__(self, address):
         self.address = address
-        self.rules: Dict[str, Subtask] = dict()
+        self.rules: Dict[str, DNNSubtask] = dict()
 
     def exist_rule(self, id):
         return id in self.rules
 
-    def add_rule(self, id, action: Subtask):
+    def add_rule(self, id, action: DNNSubtask):
         # ex) "192.168.1.5", Job
         if self.exist_rule(id):
             return False
