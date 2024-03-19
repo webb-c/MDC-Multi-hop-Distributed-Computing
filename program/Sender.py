@@ -73,12 +73,6 @@ class Sender(MDC):
         
 if __name__ == '__main__':
     sub_config = {
-        "ip": "127.0.0.1", 
-        "port": 1883,
-        "topics": [
-            ("job/dnn", 1),
-            ("mdc/network_info", 1)
-        ],
     }
     
     pub_configs = []

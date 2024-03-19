@@ -103,7 +103,9 @@ if __name__ == '__main__':
             "port": 1883,
             "topics": [
                 ("job/dnn", 1),
-                ("mdc/network_info", 1)
+                ("job/subtask_info", 1),
+                ("mdc/network_info", 1),
+                ("mdc/node_info", 1),
             ],
         }
     

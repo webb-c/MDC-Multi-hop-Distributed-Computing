@@ -130,6 +130,8 @@ if __name__ == '__main__':
             "topics": [
                 ("mdc/network_info", 1),
                 ("mdc/response", 1),
+                ("mdc/node_info", 1),
+                ("job/request_scheduling", 1),
             ],
         }
     
