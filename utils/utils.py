@@ -49,8 +49,49 @@ def save_latency(file_name, latency):
 
 
 def split_model(model, split_point) -> torch.nn.Module:
-    # return splited model
-    return None
+    current_idx = 0
+    layers = []
+    start_index, end_index = split_point
+
+    def _recursive_add_layers(module):
+        nonlocal current_idx
+        for child in module.children():
+            if len(list(child.children())) == 0 : 
+                if start_index <= current_idx < end_index:
+                    layers
+                current_idx += 1
+            else: 
+                _recursive_add_layers(child)            
+        return
+
+    _recursive_add_layers(model)
+    splited_model = torch.nn.Sequential(layers)
+
+    return splited_model
+
+def _split_model(self):
+    """ object: backbone으로 사용할 모델을 로드하고 layer_idx를 기준으로 2개의 부분으로 모델을 나누어 반환합니다."""
+    
+    current_idx = 0
+    part1_layers, part2_layers = [], []
+    
+    def _recursive_add_layers(module):
+        nonlocal current_idx
+        for child in module.children():
+            if len(list(child.children())) == 0 : 
+                if current_idx <= self.layer_idx:
+                    part1_layers.append(child)
+                else:
+                    part2_layers.append(child)
+                current_idx += 1
+            else: 
+                _recursive_add_layers(child)            
+        return
+
+    _recursive_add_layers(backbone)
+    part1_model, part2_model = nn.Sequential(*part1_layers), nn.Sequential(*part2_layers[:-1])
+    
+    return part1_model, part2_model
 
 def load_model(model_name) -> torch.nn.Module:
 
