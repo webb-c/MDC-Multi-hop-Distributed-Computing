@@ -64,7 +64,7 @@ class MDC(Program):
         try:
             links = self.job_manager.get_backlogs()
         except:
-            pass
+            return
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
 
