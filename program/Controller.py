@@ -111,7 +111,7 @@ class Controller(Program):
 
     def start(self):
         while True:
-            time.sleep(self._network_info.get_capacity())
+            time.sleep(self._network_info.get_sync_time())
             self.sync_backlog()
 
 
