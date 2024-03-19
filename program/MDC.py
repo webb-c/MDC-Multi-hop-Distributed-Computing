@@ -58,8 +58,13 @@ class MDC(Program):
         self._network_info: NetworkInfo = pickle.loads(data)
         self.job_manager = JobManager(self._address, self._network_info)
 
+        print(f"Succesfully got network info.")
+
     def handle_request_backlog(self, topic, data, publisher):
-        links = self.job_manager.get_backlogs()
+        try:
+            links = self.job_manager.get_backlogs()
+        except:
+            pass
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
 
