@@ -4,7 +4,7 @@
         {
             "job_name" : "test job 1",
             "job_type" : "dnn",
-            "model_name" : "yolov5",
+            "model_name" : "resnet-18",
             "warmup" : "True",
             "warmup_input" : [1, 32, 32, 3],
             "split_points" : [
@@ -20,7 +20,7 @@
         {
             "job_name" : "test job 2",
             "job_type" : "dnn",
-            "model_name" : "yolov5",
+            "model_name" : "resnet-18",
             "warmup" : "True",
             "warmup_input" : [1, 32, 32, 3],
             "split_points" : [
