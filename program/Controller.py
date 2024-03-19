@@ -75,7 +75,7 @@ class Controller(Program):
                 pass
 
     def handle_node_info(self, topic, payload, publisher):
-        node_link_info: NodeLinkInfo = pickle.dumps(payload)
+        node_link_info: NodeLinkInfo = pickle.loads(payload)
         links = node_link_info.get_links()
 
         self._layered_graph.set_graph(links)
