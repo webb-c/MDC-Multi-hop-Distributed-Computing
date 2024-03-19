@@ -65,7 +65,10 @@ class Controller(Program):
             # send RequestBacklog byte to source ip (response)
             request_backlog = RequestBacklog()
             request_backlog_bytes = pickle.dumps(request_backlog)
-            publish.single("mdc/node_info", request_backlog_bytes, hostname=node_ip)
+            try:
+                publish.single("mdc/node_info", request_backlog_bytes, hostname=node_ip)
+            except:
+                pass
 
     def handle_node_info(self, topic, payload, publisher):
         node_link_info: NodeLinkInfo = pickle.dumps(payload)
