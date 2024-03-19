@@ -39,6 +39,8 @@ class MDC(Program):
 
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
+        self.request_network_info()
+
     # request network information to network controller
     # sending node info.
     def request_network_info(self):
