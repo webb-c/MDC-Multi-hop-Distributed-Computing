@@ -2,124 +2,109 @@ import sys, os, json
  
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from queue import Queue
-from threading import Thread
 from program import Program
-from datetime import datetime
-
-import argparse
+from job import *
+from communication import *
 import pickle
 
-from utils.utils import get_ip_address, save_latency
-from routing_table.RoutingTable import RoutingTable
+from utils.utils import get_ip_address
 import paho.mqtt.publish as publish
 from job.JobManager import JobManager
 
 class MDC(Program):
-    def __init__(self, sub_config, pub_configs, topic):
+    def __init__(self, sub_config, pub_configs):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
-        self.address = get_ip_address("eth0")
-        self.routing_table = RoutingTable(self.address)
-        self.topic = topic
-        self.job_manager = JobManager()
-        print(self.address)
+        self._address = get_ip_address("eth0")
+        self._node_info = NodeInfo(self._address)
+        self._controller_ip = "192.168.1.2"
 
         self.topic_dispatcher = {
-            "job/dnn_output": self.handle_dnn_output_in,
-            "job/packet": self.handle_packet_in
+            "job/dnn": self.handle_dnn,
+            "job/subtask_info": self.handle_subtask_info,
+            "mdc/network_info" : self.get_network_info,
+            "mdc/node_info": self.handle_request_backlog,
         }
+
+        self.topic_dispatcher_checker = {
+            "job/dnn": [self.check_network_info_exists],
+        }
+
+        self._network_info = None
+        self.job_manager = None
 
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
-    def start(self):
-        pass
+    # request network information to network controller
+    # sending node info.
+    def request_network_info(self):
+        node_info_bytes = pickle.dumps(self._node_info)
 
-    def handle_dnn_output_in(self, topic, data, publisher):
-        dummy_job = pickle.loads(data)
-        print(dummy_job)
+        # send NetworkInfo byte to source ip (response)
+        publish.single("mdc/network_info", node_info_bytes, hostname=self._controller_ip)
 
-        if dummy_job.is_rtt_destination(self.address):
-            file_name = dummy_job.info
-            latency = dummy_job.calc_latency()
-            save_latency(file_name, latency)
-            # TODO change to save results.
+    def handle_subtask_info(self, topic, data, publisher):
+        subtask_info: SubtaskInfo = pickle.loads(data)
 
-        elif dummy_job.is_destination(self.address):
-            # response to source
-            job_id = dummy_job.get_id()
-            if self.routing_table.exist_rule(job_id): # if it is mid dst
-                destination = self.routing_table.find_rule(job_id)
-                dummy_job.set_source(self.address)
-                dummy_job.set_destination(destination)
-                dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single(self.topic, dummy_job_bytes, hostname=destination)
+        self.job_manager.add_subtask(subtask_info)
+    
+    def get_network_info(self, topic, data, publisher):
+        self._network_info: NetworkInfo = pickle.loads(data)
+        self.job_manager = JobManager(self._address, self._network_info)
 
-            else: # if it is final dst
-                dummy_job = self.job_manager.run(dummy_job)
-                dummy_job.remove_input()
-                dummy_job.set_response()
-                dummy_job.set_destination(dummy_job.source)
-                dummy_job.set_source(self.address)
-                dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single(self.topic, dummy_job_bytes, hostname=dummy_job.destination)
+    def handle_request_backlog(self, topic, data, publisher):
+        links = self.job_manager.get_backlogs()
+        node_link_info = NodeLinkInfo(self._address, links)
+        node_link_info_bytes = pickle.dumps(node_link_info)
 
-        else:
-            dummy_job_bytes = pickle.dumps(dummy_job)
-            self.publisher[0].publish(self.topic, dummy_job_bytes)
+        # send NodeLinkInfo byte to source ip (response)
+        publish.single("mdc/node_info", node_link_info_bytes, hostname=self._controller_ip)
 
-    def handle_packet_in(self, topic, data, publisher):
-        dummy_job = pickle.loads(data)
-        print(dummy_job)
-
-        if dummy_job.is_rtt_destination(self.address):
-            file_name = dummy_job.info
-            latency = dummy_job.calc_latency()
-            save_latency(file_name, latency)
-            # TODO change to save results.
-
-        elif dummy_job.is_destination(self.address):
-            # response to source
-            job_id = dummy_job.get_id()
-            if self.routing_table.exist_rule(job_id): # if it is mid dst
-                destination = self.routing_table.find_rule(job_id)
-                dummy_job.set_source(self.address)
-                dummy_job.set_destination(destination)
-                dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single(self.topic, dummy_job_bytes, hostname=destination)
-
-            else: # if it is final dst
-                dummy_job.remove_input()
-                dummy_job.set_response()
-                dummy_job.set_destination(dummy_job.source)
-                dummy_job.set_source(self.address)
-                dummy_job_bytes = pickle.dumps(dummy_job)
-                publish.single(self.topic, dummy_job_bytes, hostname=dummy_job.destination)
-
-        else:
-            dummy_job_bytes = pickle.dumps(dummy_job)
-            self.publisher[0].publish(self.topic, dummy_job_bytes)
+    def check_network_info_exists(self, data):
+        if self._network_info == None:
+            print("The node is not initialized.")
+            return False
         
-if __name__ == '__main__':
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('-p', '--peer', type=str, default="")
-    argparser.add_argument('-t', '--topic', type=str, default="job/packet")
-    args = argparser.parse_args()
+        elif self._network_info != None:
+            return True
 
+    def handle_dnn(self, topic, data, publisher):
+        previous_dnn_output: DNNOutput = pickle.loads(data)
+
+        assert previous_dnn_output.is_destination(self._address), "Job / Response's destination should be matched."
+
+        # terminal node
+        if previous_dnn_output.is_terminal_destination(self._address) and not self.job_manager.is_subtask_exists(previous_dnn_output): 
+            subtask_info = previous_dnn_output.get_subtask_info()
+            subtask_info_bytes = pickle.dumps(subtask_info)
+
+            # send subtask info to controller
+            publish.single("mdc/response", subtask_info_bytes, hostname=self._controller_ip)
+
+        else: 
+            # if this is intermidiate node
+            dnn_output = self.job_manager.run(previous_dnn_output)
+            subtask_info = dnn_output.get_subtask_info()
+
+            destination = subtask_info.get_destination()
+
+            dnn_output_bytes = pickle.dumps(dnn_output)
+                
+            # send job to next node
+            publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination)
+       
+if __name__ == '__main__':
     sub_config = {
             "ip": "127.0.0.1", 
             "port": 1883,
             "topics": [
-                (args.topic, 1),
+                ("job/dnn", 1),
+                ("mdc/network_info", 1)
             ],
         }
     
     pub_configs = [
-        {
-            "ip": args.peer, 
-            "port": 1883,
-        }
     ]
     
-    ex = MDC(sub_config=sub_config, pub_configs=pub_configs, topic=args.topic)
+    ex = MDC(sub_config=sub_config, pub_configs=pub_configs)
     ex.start()

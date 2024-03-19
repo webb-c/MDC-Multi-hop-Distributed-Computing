@@ -1,27 +1,26 @@
-import subprocess
-import socket
-import re
-import os
+import subprocess, socket, re, os
+
 import csv
 
+import torch
+from torchvision.models import resnet18, ResNet18_Weights
+
 def get_ip_address(interface_name='eth0'):
-    # 운영 체제 확인
-    if os.name == 'nt':  # 윈도우
+    # check os
+    if os.name == 'nt':  # windows
         return get_ip_address_windows(interface_name)
-    else:  # 리눅스/유닉스
+    else:  # linux / unix
         return get_ip_address_linux(interface_name)
 
 def get_ip_address_windows(interface_name='eth0'):
-    # 윈도우에서는 인터페이스 이름 대신 socket.gethostbyname을 사용합니다.
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     return ip_address
 
 def get_ip_address_linux(interface_name='eth0'):
-    # 리눅스에서 ip addr 명령어를 사용하여 IP 주소를 찾습니다.
     try:
         ip_addr_output = subprocess.check_output(["ip", "addr", "show", interface_name], encoding='utf-8')
-        # inet으로 시작하는 줄에서 IP 주소를 찾기 위한 정규 표현식
+
         ip_pattern = re.compile(r"inet (\d+\.\d+\.\d+\.\d+)/")
         ip_match = ip_pattern.search(ip_addr_output)
         if ip_match:
@@ -33,7 +32,7 @@ def get_ip_address_linux(interface_name='eth0'):
     
 
 def save_latency(file_name, latency):
-    file_path = f"results/{file_name}.csv"
+    file_path = f"{file_name}.csv"
     # 파일이 존재하는지 확인
     file_exists = os.path.exists(file_path)
 
@@ -47,3 +46,25 @@ def save_latency(file_name, latency):
         
         # 데이터 행을 파일에 씁니다.
         writer.writerow([latency])
+
+
+def split_model(model, split_point) -> torch.nn.Module:
+    # return splited model
+    return None
+
+def load_model(model_name) -> torch.nn.Module:
+
+    available_model_list = ["yolov5", "resnet-18", "resnet-50"]
+
+    assert model_name in available_model_list, f"Model must be in {available_model_list}."
+
+    if model_name == "yolov5":
+        return None # TODO
+    
+    elif model_name == "resnet-18":
+        model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+        model.eval()
+        return model # TODO
+    
+    elif model_name == "resnet-50":
+        return None # TODO
