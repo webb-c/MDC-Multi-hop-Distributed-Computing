@@ -1,7 +1,7 @@
 import torch
 
 from communication import *
-from job import *
+from job import SubtaskInfo
 
 class DNNOutput:
     def __init__(self, data: torch.Tensor, subtask_info: SubtaskInfo) -> None:
@@ -27,7 +27,7 @@ class DNNOutput:
             return False
         
     def is_terminal_destination(self, other_address):
-        if self._dnn_info.get_terminal_destination() == other_address:
+        if self._subtask_info.get_terminal_destination() == other_address:
             return True
         else:
             return False

@@ -8,5 +8,4 @@ from job.JobInfo import JobInfo
 
 from job.JobManager import JobManager
 
-
 from job.SubtaskInfo import SubtaskInfo
