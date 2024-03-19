@@ -22,3 +22,6 @@ class JobInfo:
     
     def get_job_name(self):
         return self._job_name
+    
+    def set_start_time(self, start_time: float):
+        self._start_time = start_time

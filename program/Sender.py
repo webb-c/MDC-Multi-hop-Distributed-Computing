@@ -1,66 +1,92 @@
-import sys, os, json
+import sys, os
  
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
-from program import Program
-from job.Job import Job
-from job.DNNJob import DNNJob
-
-import argparse
 import pickle
 import time
+from multiprocessing import shared_memory
+
+import numpy as np
+import cv2
 
 from utils.utils import get_ip_address
+from program import MDC
+from job import JobInfo
 
-class Sender(Program):
-    def __init__(self, sub_config, pub_configs, topic):
-        self.sub_config = sub_config
-        self.pub_configs = pub_configs
-        self.topic = topic
-        self.address = get_ip_address("eth0")
-        self.a = 0
 
-        if "packet" in self.topic:
-            self.job = Job
-        elif "dnn_output" in self.topic:
-            self.job = DNNJob
+TARGET_WIDTH = 960
+TAREGET_HEIGHT= 540
+TARGET_DEPTH = 3
 
-        self.topic_dispatcher = {
-        }
 
-        super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
+class Sender(MDC):
+    def __init__(self, sub_config, pub_configs, job_name):
+        self._address = get_ip_address("eth0")
+        self._frame = None
+        self._shape = (TAREGET_HEIGHT, TARGET_WIDTH, TARGET_DEPTH)
+        self._shared_memory_name = "jetson"
 
-    def send_dummy_job(self, size, sleep_time, iterate_time, dst, id, ex_mode):
-        info = f"sleeptime_{sleep_time}_size_{size}_it_{iterate_time}_mode_{ex_mode}"
-        data = "0" * size
-        for _ in range(iterate_time):
-            dummy_job = self.job(data, self.address, dst, id, info, self.a)
-            self.a += 1
-            dummy_job_bytes = pickle.dumps(dummy_job)
-            self.publisher[0].publish(self.topic, dummy_job_bytes)
-            print("send", self.a)
+        self._job_name = job_name
+        self._job_info = None
 
-            time.sleep(sleep_time)
+        super().__init__(sub_config, pub_configs)
+
+        self.init_job_info()
+
+    def init_job_info(self):
+        source_ip = self._address
+        terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
+        job_type = self._network_info.get_jobs()[self._job_name]["job_type"]
+        job_name = self._job_name
+
+        job_info = JobInfo(source_ip, terminal_destination, job_type, job_name)
+
+        self._job_info = job_info
+
+    def stream_player(self):
+        # print('[arr_stream] getting ')
+        shm = shared_memory.SharedMemory(name=self._shared_memory_name)
+
+        c = np.ndarray(self._shared_memory_name, dtype=np.uint8, buffer=shm.buf)
+
+        while True:
+            self._frame = c
+            if cv2.waitKey(int(1000 / 24)) == ord('q'):
+                break
+
+        shm.unlink()
+        shm.close()
+
+    def run(self):
+        while True:
+            # with any frame drop logic
+            time.sleep(0.03)
+            self.set_job_info_time()
+
+            job_info_bytes = pickle.dumps(self._job_info)
+
+            self._controller_publisher.publish("job/dnn", job_info_bytes)
+
+    def set_job_info_time(self):
+        self._job_info.set_start_time(time.time_ns())
+
         
 if __name__ == '__main__':
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument('-p', '--peer', type=str, default="")
-    argparser.add_argument('-d', '--destination', type=str, default="192.168.1.7")
-    argparser.add_argument('-t', '--topic', type=str, default="job/packet")
-    argparser.add_argument('-g', '--sleep_gap', type=float, default="0.1")
-    argparser.add_argument('-s', '--size', type=int, default="100")
-    argparser.add_argument('-i', '--iterate', type=int, default="100")
-    argparser.add_argument('-id', '--id', type=str, default="test")
-    argparser.add_argument('-m', '--mode', type=str, default="lower")
-    args = argparser.parse_args()
-
-    sub_config = None
-    pub_configs = [
-        {
-            "ip": args.destination, 
-            "port": 1883,
-        }
-    ]
+    sub_config = {
+        "ip": "127.0.0.1", 
+        "port": 1883,
+        "topics": [
+            ("job/dnn", 1),
+            ("mdc/network_info", 1)
+        ],
+    }
     
-    sender = Sender(sub_config=sub_config, pub_configs=pub_configs, topic=args.topic)
-    sender.send_dummy_job(args.size, args.sleep_gap / 1000, args.iterate, args.destination, args.id, args.mode)
+    pub_configs = []
+
+    job_name = "test job 1"
+
+    sender = Sender(sub_config, pub_configs, job_name)
+    sender.run()
+
+
+

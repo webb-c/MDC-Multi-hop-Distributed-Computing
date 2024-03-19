@@ -9,6 +9,7 @@ import pickle
 
 from utils.utils import get_ip_address
 import paho.mqtt.publish as publish
+import MQTTclient
 from job.JobManager import JobManager
 
 class MDC(Program):
@@ -17,7 +18,10 @@ class MDC(Program):
         self.pub_configs = pub_configs
         self._address = get_ip_address("eth0")
         self._node_info = NodeInfo(self._address)
-        self._controller_ip = "192.168.1.2"
+        self._controller_publisher = MQTTclient.Publisher(config={
+            "ip" : "192.168.1.2",
+            "port" : 1883
+        })
 
         self.topic_dispatcher = {
             "job/dnn": self.handle_dnn,
@@ -41,7 +45,7 @@ class MDC(Program):
         node_info_bytes = pickle.dumps(self._node_info)
 
         # send NetworkInfo byte to source ip (response)
-        publish.single("mdc/network_info", node_info_bytes, hostname=self._controller_ip)
+        self._controller_publisher.publish("mdc/network_info", node_info_bytes)
 
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
@@ -58,7 +62,7 @@ class MDC(Program):
         node_link_info_bytes = pickle.dumps(node_link_info)
 
         # send NodeLinkInfo byte to source ip (response)
-        publish.single("mdc/node_info", node_link_info_bytes, hostname=self._controller_ip)
+        self._controller_publisher.publish("mdc/node_info", node_link_info_bytes)
 
     def check_network_info_exists(self, data):
         if self._network_info == None:
@@ -79,7 +83,7 @@ class MDC(Program):
             subtask_info_bytes = pickle.dumps(subtask_info)
 
             # send subtask info to controller
-            publish.single("mdc/response", subtask_info_bytes, hostname=self._controller_ip)
+            self._controller_publisher.publish("mdc/response", subtask_info_bytes)
 
         else: 
             # if this is intermidiate node
