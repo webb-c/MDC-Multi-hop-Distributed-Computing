@@ -54,11 +54,15 @@ class Controller(Program):
         node_info: NodeInfo = pickle.loads(payload)
         ip = node_info.get_ip()
 
+        print(f"ip: {ip} requested network information.")
+
         # make NetworkInfo & NetworkInfo byte
         network_info_bytes = pickle.dumps(self._network_info)
 
         # send NetworkInfo byte to source ip (response)
         publish.single("mdc/network_info", network_info_bytes, hostname=ip)
+
+        print(f"Succesfully respond to ip: {ip}.")
 
     def sync_backlog(self):
         for node_ip in self._network_info.get_network():
