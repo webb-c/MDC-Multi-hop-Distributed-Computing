@@ -64,11 +64,11 @@ class MDC(Program):
         print(f"Succesfully got network info.")
 
     def handle_request_backlog(self, topic, data, publisher):
-        print("requested backlog")
         try:
             links = self.job_manager.get_backlogs()
         except:
             return
+        print(links)
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
 
