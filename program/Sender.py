@@ -34,8 +34,6 @@ class Sender(MDC):
 
         super().__init__(sub_config, pub_configs)
 
-        self.init_job_info()
-
     def init_job_info(self):
         source_ip = self._address
         terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
@@ -73,7 +71,13 @@ class Sender(MDC):
             self._controller_publisher.publish("job/dnn", job_info_bytes)
 
     def set_job_info_time(self):
-        self._job_info.set_start_time(time.time_ns())
+        if self._network_info == None:
+            try:
+                self.init_job_info()
+            except:
+                pass
+        else:
+            self._job_info.set_start_time(time.time_ns())
 
         
 if __name__ == '__main__':
