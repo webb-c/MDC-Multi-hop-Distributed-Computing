@@ -27,7 +27,7 @@ class Sender(MDC):
         self._shared_memory_name = "jetson"
         self._memory = posix_ipc.SharedMemory(self._shared_memory_name, flags=posix_ipc.O_CREAT, mode=0o777, size=int(np.prod(self._shape) * np.dtype(np.uint8).itemsize))
         self._map_file = mmap.mmap(self._memory.fd, self._memory.size)
-        posix_ipc.close_fd(self._memory.fd)
+        # posix_ipc.close_fd(self._memory.fd)
 
         self._job_name = job_name
         self._job_info = None
