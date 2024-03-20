@@ -33,7 +33,7 @@ class Dijkstra:
                     new_distance = current_distance + distance
 
                     # If a shorter path is found
-                    if new_distance < distances[neighbor_pair_str]:
+                    if new_distance < distances[neighbor.to_string()]:
                         distances[neighbor.to_string()] = new_distance
                         previous_nodes[neighbor.to_string()] = current_node
                         heapq.heappush(pq, (new_distance, neighbor))

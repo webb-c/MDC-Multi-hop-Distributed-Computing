@@ -40,7 +40,7 @@ class LayeredGraph:
             destinations: Dict = links_job_num.setdefault(source_node_ip, {})
             destinations.setdefault(destination_node_ip, 0)
 
-            if self._layered_graph_backlog[link] > 0:
+            if self._layered_graph_backlog[link.to_string()] > 0:
                 destinations[destination_node_ip] += 1
 
         for source in self._layer_node_pairs:
@@ -54,7 +54,7 @@ class LayeredGraph:
             if link_job_num > 0:
                 job_computing_delta = elapsed_time * capacity / link_job_num
 
-                self._layered_graph_backlog[link] = max(0, self._layered_graph_backlog[link] - job_computing_delta)
+                self._layered_graph_backlog[link.to_string()] = max(0, self._layered_graph_backlog[link.to_string()] - job_computing_delta)
 
         self._previous_update_time = time.time()
 
@@ -88,7 +88,7 @@ class LayeredGraph:
 
     def init_algorithm(self):
         module_path = self._network_info.get_scheduling_algorithm().replace(".py", "").replace("/", ".")
-        self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path)
+        self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path).Dijkstra()
 
     def schedule(self, source_ip: str, job_info: JobInfo):
         source_node = LayerNode(source_ip, 0)
