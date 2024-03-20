@@ -87,7 +87,7 @@ class LayeredGraph:
                 self._layered_graph_backlog[link.to_string()] = 0
 
     def init_algorithm(self):
-        module_path = self._network_info.get_scheduling_algorithm().replace(".py", "")
+        module_path = self._network_info.get_scheduling_algorithm().replace(".py", "").replace("/", ".")
         self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path)
 
     def schedule(self, source_ip: str, job_info: JobInfo):
