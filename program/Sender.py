@@ -15,8 +15,8 @@ from program import MDC
 from job import JobInfo
 
 
-TARGET_WIDTH = 960
-TAREGET_HEIGHT= 540
+TARGET_WIDTH = 224
+TAREGET_HEIGHT= 224
 TARGET_DEPTH = 3
 
 
@@ -26,6 +26,7 @@ class Sender(MDC):
         self._frame = None
         self._shape = (TAREGET_HEIGHT, TARGET_WIDTH, TARGET_DEPTH)
         self._shared_memory_name = "jetson"
+        self._shared_memory = shared_memory.SharedMemory(name=self._shared_memory_name)
 
         self._job_name = job_name
         self._job_info = None
@@ -45,18 +46,15 @@ class Sender(MDC):
         self._job_info = job_info
 
     def stream_player(self):
-        # print('[arr_stream] getting ')
-        shm = shared_memory.SharedMemory(name=self._shared_memory_name)
-
-        c = np.ndarray(self._shared_memory_name, dtype=np.uint8, buffer=shm.buf)
+        c = np.ndarray(self._shared_memory_name, dtype=np.uint8, buffer=self._shared_memory.buf)
 
         while True:
             self._frame = c
             if cv2.waitKey(int(1000 / 24)) == ord('q'):
                 break
 
-        shm.unlink()
-        shm.close()
+        self._shared_memory.unlink()
+        self._shared_memory.close()
 
     def run(self):
         streamer_thread = Thread(target=self.stream_player, args=())
