@@ -11,7 +11,8 @@ import time
 class LayeredGraph:
     def __init__(self, network_info: NetworkInfo):
         self._network_info = network_info
-        self._layered_graph = network_info.get_network()
+        self._network = network_info.get_network()
+        self._layered_graph = dict()
         self._layered_graph_backlog = dict()
         self._layer_nodes = []
         self._layer_node_pairs = []
@@ -65,12 +66,17 @@ class LayeredGraph:
         max_job_length = max([len(job["split_points"]) for job_name, job in self._network_info.get_jobs().items()])
 
         for layer in range(max_job_length):
-            for source_ip in self._layered_graph:
+            for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 self._layer_nodes.append(source)
 
-                for destination_ip in self._layered_graph[source_ip]:
+                for destination_ip in self._network[source_ip]:
                     destination = LayerNode(destination_ip, layer)
+
+                    if source.to_string() in self._layered_graph:
+                        self._layered_graph[source.to_string()].append(destination.to_string())
+                    else:
+                        self._layered_graph[source.to_string()] = [destination.to_string()]
 
                     link = LayerNodePair(source, destination)
 
@@ -78,21 +84,30 @@ class LayeredGraph:
                     self._layered_graph_backlog[link.to_string()] = 0
 
         for layer in range(max_job_length - 1):
-            for source_ip in self._layered_graph:
+            for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 destination = LayerNode(source_ip, layer + 1)
+
+                if source.to_string() in self._layered_graph:
+                    self._layered_graph[source.to_string()].append(destination.to_string())
+                else:
+                    self._layered_graph[source.to_string()] = [destination.to_string()]
+
                 link = LayerNodePair(source, destination)
 
                 self._layer_node_pairs.append(link)
                 self._layered_graph_backlog[link.to_string()] = 0
+
+        print(self._layered_graph_backlog)
 
     def init_algorithm(self):
         module_path = self._network_info.get_scheduling_algorithm().replace(".py", "").replace("/", ".")
         self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path).Dijkstra()
 
     def schedule(self, source_ip: str, job_info: JobInfo):
+        split_num = len(self._network_info.get_jobs()[job_info.get_job_name()]["split_points"])
         source_node = LayerNode(source_ip, 0)
-        destination_node = job_info.get_terminal_destination
+        destination_node = LayerNode(job_info.get_terminal_destination(), split_num - 1)
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
 
         return path

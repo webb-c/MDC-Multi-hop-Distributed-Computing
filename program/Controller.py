@@ -84,17 +84,21 @@ class Controller(Program):
         self._layered_graph.update_graph()
         job_info: JobInfo = pickle.loads(payload)
 
+        print(job_info.get_job_name())
+
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
 
+        print(path)
+
         # send job info to all nodes in schedule.
         # TODO
         model_index = 0
         for i in range(len(path) - 1):
-            source_node: LayerNode = path[i]
-            destination_node: LayerNode = path[i + 1]
+            source_node: LayerNode = LayerNode(path[i].split("-")[0], path[i].split("-")[1])
+            destination_node: LayerNode = LayerNode(path[i + 1].split("-")[0], path[i + 1].split("-")[1])
             computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][i]
             transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][i]
 

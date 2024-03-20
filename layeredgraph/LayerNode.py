@@ -30,3 +30,6 @@ class LayerNode:
     def to_string(self) -> str:
         return f"{self._ip}-{self._layer}"
     
+    def __lt__(self, other):
+        return self.get_ip() < other.get_ip()
+    

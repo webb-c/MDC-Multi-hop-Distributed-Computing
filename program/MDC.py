@@ -32,6 +32,7 @@ class MDC(Program):
 
         self.topic_dispatcher_checker = {
             "job/dnn": [self.check_network_info_exists],
+            "job/subtask_info": [self.check_job_manager_exists],
         }
 
         self._network_info = None
@@ -77,6 +78,14 @@ class MDC(Program):
             return False
         
         elif self._network_info != None:
+            return True
+        
+    def check_job_manager_exists(self, data):
+        if self.job_manager == None:
+            print("The job_manager is not initialized.")
+            return False
+        
+        elif self.job_manager != None:
             return True
 
     def handle_dnn(self, topic, data, publisher):

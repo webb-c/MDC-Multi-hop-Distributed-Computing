@@ -9,6 +9,12 @@ class Dijkstra:
     def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, layered_graph_backlog, layer_nodes):
         distances = {node.to_string(): float('infinity') for node in layer_nodes}
         previous_nodes = {node.to_string(): None for node in layer_nodes}
+
+        print("source_node", source_node.to_string())
+        print("destination_node", destination_node.to_string())
+        print("layered_graph", layered_graph)
+        print("layered_graph_backlog", layered_graph_backlog)
+        print("layer_nodes", layer_nodes)
         
         # Set distance for the source node to zero
         distances[source_node.to_string()] = 0
@@ -17,14 +23,17 @@ class Dijkstra:
 
         while pq:
             current_distance, current_node = heapq.heappop(pq)
+            print("current_distance", current_distance)
+            print("current_node", current_node.to_string())
 
             # Stop if the destination is reached
-            if current_node == destination_node:
+            if current_node.to_string() == destination_node.to_string():
                 break
 
             # For each neighbor of the current node
-            for neighbor_ip in layered_graph[current_node.get_ip()]:
-                neighbor = LayerNode(neighbor_ip, current_node.get_layer())
+            for neighbor_string in layered_graph[current_node.to_string()]:
+                print("neighbor_string", neighbor_string)
+                neighbor = LayerNode(neighbor_string.split("-")[0], neighbor_string.split("-")[1])
                 neighbor_pair = LayerNodePair(current_node, neighbor)
                 neighbor_pair_str = neighbor_pair.to_string()
 
@@ -35,15 +44,16 @@ class Dijkstra:
                     # If a shorter path is found
                     if new_distance < distances[neighbor.to_string()]:
                         distances[neighbor.to_string()] = new_distance
-                        previous_nodes[neighbor.to_string()] = current_node
+                        previous_nodes[neighbor.to_string()] = current_node.to_string()
                         heapq.heappush(pq, (new_distance, neighbor))
 
         # Path reconstruction from source to destination
         path = []
-        current = destination_node
+        current = destination_node.to_string()
+        print(previous_nodes)
         while current is not None and current in previous_nodes:
             path.append(current)
-            current = previous_nodes[current.to_string()]
+            current = previous_nodes[current]
         path.reverse()  # Reverse the path to start from the source
 
         # Use the path for scheduling or further processing
