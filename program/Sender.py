@@ -73,14 +73,15 @@ class Sender(MDC):
 
     def set_job_info_time(self):
         if self._network_info == None:
-            try:
-                self.init_job_info()
-            except:
-                pass
             return False
+        
         else:
-            self._job_info.set_start_time(time.time_ns())
-            return True
+            if self._job_info == None:
+                self.init_job_info()
+                return True
+            else:
+                self._job_info.set_start_time(time.time_ns())
+                return True
 
         
 if __name__ == '__main__':
