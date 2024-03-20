@@ -49,7 +49,6 @@ class Sender(MDC):
 
         while True:
             self._frame = c.copy()
-            print(self._frame.shape)
             if cv2.waitKey(int(1000 / 24)) == ord('q'):
                 break
 
@@ -63,9 +62,11 @@ class Sender(MDC):
 
         while True:
             # with any frame drop logic
-            time.sleep(0.03)
+            time.sleep(0.1)
             if not self.set_job_info_time():
                 continue
+
+            print(self._frame.shape)
 
             job_info_bytes = pickle.dumps(self._job_info)
 
