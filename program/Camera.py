@@ -16,7 +16,6 @@ class Camera:
         self.memory = posix_ipc.SharedMemory(self.shared_memory_name, posix_ipc.O_CREAT, size=sample_array.nbytes)
         self.map_file = mmap.mmap(self.memory.fd, self.memory.size)
         # Immediately close the file descriptor since we don't need it anymore
-        posix_ipc.close_fd(self.memory.fd)
         self._camera = CSICamera(width=224, height=224)
 
     def run_camera(self):
