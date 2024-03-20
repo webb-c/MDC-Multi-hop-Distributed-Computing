@@ -66,6 +66,8 @@ class JobManager:
 
     # add rule based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
+        print(subtask_info._source.to_string())
+        print(subtask_info._destination.to_string())
         if subtask_info.is_transmission():
             print("tra")
             subtask_id = subtask_info.get_subtask_id()
