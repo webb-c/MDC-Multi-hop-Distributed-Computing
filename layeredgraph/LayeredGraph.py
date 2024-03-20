@@ -62,7 +62,7 @@ class LayeredGraph:
         self._layered_graph_backlog[link] = backlog
 
     def init_graph(self):
-        max_job_length = max([job["split_points"] for job in self._network_info.get_jobs()])
+        max_job_length = max([job["split_points"] for job_name, job in self._network_info.get_jobs().items()])
 
         for layer in range(max_job_length):
             for source_ip in self._layered_graph:
