@@ -66,7 +66,8 @@ class MDC(Program):
     def handle_request_backlog(self, topic, data, publisher):
         try:
             links = self.job_manager.get_backlogs()
-        except:
+        except Exception as e:  # 예외가 발생했을 때 실행됨
+            print('예외가 발생했습니다.', e)
             return
         print(links)
         node_link_info = NodeLinkInfo(self._address, links)
