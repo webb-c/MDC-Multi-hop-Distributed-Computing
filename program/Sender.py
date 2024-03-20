@@ -68,7 +68,7 @@ class Sender(MDC):
 
             job_info_bytes = pickle.dumps(self._job_info)
 
-            self._controller_publisher.publish("job/dnn", job_info_bytes)
+            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
 
     def set_job_info_time(self):
         if self._network_info == None:
