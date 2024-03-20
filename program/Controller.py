@@ -82,7 +82,7 @@ class Controller(Program):
 
     def handle_request_scheduling(self, topic, payload, publisher):
         self._layered_graph.update_graph()
-        job_info: JobInfo = pickle.dumps(payload)
+        job_info: JobInfo = pickle.loads(payload)
 
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
