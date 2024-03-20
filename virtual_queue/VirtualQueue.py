@@ -41,7 +41,7 @@ class VirtualQueue:
             if rule in links:
                 links[rule] += subtask.get_backlog()
             else:
-                link[rule] = subtask.get_backlog()
+                links[rule] = subtask.get_backlog()
 
         return links
         
