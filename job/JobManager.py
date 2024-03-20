@@ -67,10 +67,12 @@ class JobManager:
     # add rule based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
         if subtask_info.is_transmission():
+            print("tra")
             subtask_id = subtask_info.get_subtask_id()
             subtask = DNNSubtask(subtask_info, None)
 
         elif subtask_info.is_computing():
+            print("is_computing")
             subtask_id = subtask_info.get_subtask_id()
             subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_sequence()]
             subtask = DNNSubtask(subtask_info, subtask_model)
