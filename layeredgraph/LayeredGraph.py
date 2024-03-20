@@ -18,6 +18,9 @@ class LayeredGraph:
         self._scheduling_algorithm = None
         self._previous_update_time = time.time()
 
+        self.init_graph()
+        self.init_algorithm()
+
     def set_graph(self, links):
         self._previous_update_time = time.time()
         for link in links:
