@@ -1,8 +1,7 @@
 {
     "experiment_name" : "ex1",
-    "jobs": [
-        {
-            "job_name" : "test job 1",
+    "jobs": {
+        "test job 1" : {
             "job_type" : "dnn",
             "model_name" : "resnet-18",
             "warmup" : "True",
@@ -17,8 +16,7 @@
             "source" : "192.168.1.5",
             "destination" : "192.168.1.8"
         },
-        {
-            "job_name" : "test job 2",
+        "test job 2" : {
             "job_type" : "dnn",
             "model_name" : "resnet-18",
             "warmup" : "True",
@@ -33,8 +31,7 @@
             "source" : "192.168.1.5",
             "destination" : "192.168.1.8"
         }
-    ], 
-
+    },
     "network": {
         "192.168.1.5": ["192.168.1.6", "192.168.1.7"], 
         "192.168.1.6": ["192.168.1.8"], 

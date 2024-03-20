@@ -17,22 +17,24 @@ class JobManager:
         self.init_models()
 
     def init_models(self):
-        for job in self._network_info.get_jobs():
+        jobs = self._network_info.get_jobs()
+        for job_name in jobs:
+            job = jobs["job_name"]
             if job["job_type"] == "dnn":
                 # load whole dnn model
                 model_name = job["model_name"]
                 model = load_model(model_name).eval()
 
                 # init model list and split model
-                self._models[job["job_name"]] = []
+                self._models[job_name] = []
                 for split_point in job["split_points"]:
                     subtask : torch.nn.Module = split_model(model, split_point)
-                    self._models[job["job_name"]].append(subtask)
+                    self._models[job_name].append(subtask)
 
                 # load models first time
                 if job["warmup"]:
                     x = torch.zeros(job["warmup_input"])
-                    for subtask in self._models[job["job_name"]]:
+                    for subtask in self._models[job_name]:
                         x : torch.Tensor = subtask(x)
 
             elif job["job_type"] == "packet":
