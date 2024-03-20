@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import pickle
 import time
 from multiprocessing import shared_memory
+from threading import Thread
 
 import numpy as np
 import cv2
@@ -58,6 +59,10 @@ class Sender(MDC):
         shm.close()
 
     def run(self):
+        streamer_thread = Thread(target=self.stream_player, args=())
+
+        streamer_thread.start()
+
         while True:
             # with any frame drop logic
             time.sleep(0.03)
