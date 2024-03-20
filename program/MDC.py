@@ -38,7 +38,7 @@ class MDC(Program):
         self._network_info = None
         self.job_manager = None
 
-        super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
+        super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher, self.topic_dispatcher_checker)
 
         self.request_network_info()
 
