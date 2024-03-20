@@ -64,7 +64,8 @@ class Sender(MDC):
         while True:
             # with any frame drop logic
             time.sleep(0.03)
-            self.set_job_info_time()
+            if not self.set_job_info_time():
+                continue
 
             job_info_bytes = pickle.dumps(self._job_info)
 
@@ -76,8 +77,10 @@ class Sender(MDC):
                 self.init_job_info()
             except:
                 pass
+            return False
         else:
             self._job_info.set_start_time(time.time_ns())
+            return True
 
         
 if __name__ == '__main__':
