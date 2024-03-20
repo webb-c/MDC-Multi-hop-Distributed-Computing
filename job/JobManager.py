@@ -19,7 +19,7 @@ class JobManager:
     def init_models(self):
         jobs = self._network_info.get_jobs()
         for job_name in jobs:
-            job = jobs["job_name"]
+            job = jobs[job_name]
             if job["job_type"] == "dnn":
                 # load whole dnn model
                 model_name = job["model_name"]
