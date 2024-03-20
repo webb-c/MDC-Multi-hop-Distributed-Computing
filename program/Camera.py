@@ -1,17 +1,22 @@
-from multiprocessing import shared_memory
 import numpy as np
 import cv2
+import posix_ipc
+import mmap
 from jetcam.csi_camera import CSICamera
 from jetcam.utils import bgr8_to_jpeg
 
 TARGET_WIDTH = 224
-TAREGET_HEIGHT= 224
+TARGET_HEIGHT = 224
 TARGET_DEPTH = 3
 
 class Camera:
     def __init__(self):
-        sample_array = np.zeros((TAREGET_HEIGHT, TARGET_WIDTH, TARGET_DEPTH), dtype=np.uint8)  # (600768,)
-        self._shared_memory = shared_memory.SharedMemory(name ='shm',create=True, size=sample_array.nbytes)
+        sample_array = np.zeros((TARGET_HEIGHT, TARGET_WIDTH, TARGET_DEPTH), dtype=np.uint8)
+        self.shared_memory_name = "jetson"
+        self.memory = posix_ipc.SharedMemory(self.shared_memory_name, posix_ipc.O_CREAT, size=sample_array.nbytes)
+        self.map_file = mmap.mmap(self.memory.fd, self.memory.size)
+        # Immediately close the file descriptor since we don't need it anymore
+        posix_ipc.close_fd(self.memory.fd)
         self._camera = CSICamera(width=224, height=224)
 
     def run_camera(self):
@@ -20,12 +25,12 @@ class Camera:
 
     def update_image(self, change):
         image = change['new']
-        shared_a = np.ndarray(image.shape, dtype=image.dtype, buffer=self._shared_memory.buf)
-        shared_a[:] = image
+        shared_a = np.ndarray(image.shape, dtype=image.dtype, buffer=self.map_file)
+        np.copyto(shared_a, image)
 
     def unlink_shared_memory(self):
-        self._shared_memory.unlink()
-        self._shared_memory.close()
+        self.map_file.close()
+        self.memory.unlink()
 
 if __name__ == '__main__':
     camera = Camera()
