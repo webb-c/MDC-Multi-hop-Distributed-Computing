@@ -41,7 +41,7 @@ class LayeredGraph:
             destinations: Dict = links_job_num.setdefault(source_node_ip, {})
             destinations.setdefault(destination_node_ip, 0)
 
-            if self._layered_graph_backlog[link.to_string()] > 0:
+            if self._layered_graph_backlog[link] > 0:
                 destinations[destination_node_ip] += 1
 
         for source in self._layer_node_pairs:
@@ -55,7 +55,7 @@ class LayeredGraph:
             if link_job_num > 0:
                 job_computing_delta = elapsed_time * capacity / link_job_num
 
-                self._layered_graph_backlog[link.to_string()] = max(0, self._layered_graph_backlog[link.to_string()] - job_computing_delta)
+                self._layered_graph_backlog[link] = max(0, self._layered_graph_backlog[link] - job_computing_delta)
 
         self._previous_update_time = time.time()
 
@@ -73,30 +73,30 @@ class LayeredGraph:
                 for destination_ip in self._network[source_ip]:
                     destination = LayerNode(destination_ip, layer)
 
-                    if source.to_string() in self._layered_graph:
-                        self._layered_graph[source.to_string()].append(destination.to_string())
+                    if source in self._layered_graph:
+                        self._layered_graph[source].append(destination)
                     else:
-                        self._layered_graph[source.to_string()] = [destination.to_string()]
+                        self._layered_graph[source] = [destination]
 
                     link = LayerNodePair(source, destination)
 
                     self._layer_node_pairs.append(link)
-                    self._layered_graph_backlog[link.to_string()] = 0
+                    self._layered_graph_backlog[link] = 0
 
         for layer in range(max_job_length - 1):
             for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 destination = LayerNode(source_ip, layer + 1)
 
-                if source.to_string() in self._layered_graph:
-                    self._layered_graph[source.to_string()].append(destination.to_string())
+                if source in self._layered_graph:
+                    self._layered_graph[source].append(destination)
                 else:
-                    self._layered_graph[source.to_string()] = [destination.to_string()]
+                    self._layered_graph[source] = [destination]
 
                 link = LayerNodePair(source, destination)
 
                 self._layer_node_pairs.append(link)
-                self._layered_graph_backlog[link.to_string()] = 0
+                self._layered_graph_backlog[link] = 0
 
         print(self._layered_graph_backlog)
 

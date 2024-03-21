@@ -38,7 +38,7 @@ class VirtualQueue:
         for subtask_info in self.subtask_infos:
             subtask: DNNSubtask = self.subtask_infos[subtask_info]
 
-            link = subtask_info.get_link().to_string()
+            link = subtask_info.get_link()
 
             if subtask_info in links:
                 links[link] += subtask.get_backlog()
