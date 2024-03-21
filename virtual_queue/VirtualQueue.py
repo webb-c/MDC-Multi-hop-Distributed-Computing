@@ -16,15 +16,12 @@ class VirtualQueue:
         return result
 
     def add_subtask_info(self, subtask_info, subtask: DNNSubtask):
-        self.mutex.acquire()
         # ex) "192.168.1.5", Job
         if self.exist_subtask_info(subtask_info):
-            self.mutex.release()
             return False
         
         else:
             self.subtask_infos[subtask_info] = subtask
-            self.mutex.release()
             return True
 
     def del_subtask_info(self, subtask_info):
@@ -34,7 +31,10 @@ class VirtualQueue:
     
     def find_subtask_info(self, subtask_info):
         if self.exist_subtask_info(subtask_info):
-            return self.subtask_infos[subtask_info]
+            self.mutex.acquire()
+            result = self.subtask_infos[subtask_info]
+            self.mutex.release()
+            return result
         else:
             raise Exception("No flow subtask_infos : ", subtask_info)
         
