@@ -14,7 +14,7 @@ class JobInfo:
         return self._source_ip
 
     def get_job_id(self):
-        return self._delimeter.join([self._job_name, self._start_time])
+        return self._delimeter.join([self._job_name, str(self._start_time)])
     
     def get_terminal_destination(self):
         return self._terminal_destination
