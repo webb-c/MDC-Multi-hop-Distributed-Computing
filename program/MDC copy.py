@@ -43,8 +43,8 @@ class MDC(Program):
         elif dummy_job.is_destination(self.address):
             # response to source
             job_id = dummy_job.get_id()
-            if self.routing_table.exist_rule(job_id): # if it is mid dst
-                destination = self.routing_table.find_rule(job_id)
+            if self.routing_table.exist_subtask_info(job_id): # if it is mid dst
+                destination = self.routing_table.find_subtask_info(job_id)
                 dummy_job.set_source(self.address)
                 dummy_job.set_destination(destination)
                 dummy_job_bytes = pickle.dumps(dummy_job)
@@ -76,8 +76,8 @@ class MDC(Program):
         elif dummy_job.is_destination(self.address):
             # response to source
             job_id = dummy_job.get_id()
-            if self.routing_table.exist_rule(job_id): # if it is mid dst
-                destination = self.routing_table.find_rule(job_id)
+            if self.routing_table.exist_subtask_info(job_id): # if it is mid dst
+                destination = self.routing_table.find_subtask_info(job_id)
                 dummy_job.set_source(self.address)
                 dummy_job.set_destination(destination)
                 dummy_job_bytes = pickle.dumps(dummy_job)

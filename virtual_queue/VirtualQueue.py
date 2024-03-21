@@ -4,43 +4,43 @@ from job import DNNSubtask
 class VirtualQueue:
     def __init__(self, address):
         self.address = address
-        self.rules: Dict[str, DNNSubtask] = dict()
+        self.subtask_infos: Dict[str, DNNSubtask] = dict()
 
-    def exist_rule(self, id):
-        return id in self.rules
+    def exist_subtask_info(self, id):
+        return id in self.subtask_infos
 
-    def add_rule(self, id, action: DNNSubtask):
+    def add_subtask_info(self, id, action: DNNSubtask):
         # ex) "192.168.1.5", Job
-        if self.exist_rule(id):
+        if self.exist_subtask_info(id):
             return False
         
         else:
-            self.rules[id] = action
+            self.subtask_infos[id] = action
             return True
 
-    def del_rule(self, id):
-        del self.rules[id]
+    def del_subtask_info(self, id):
+        del self.subtask_infos[id]
     
-    def find_rule(self, id):
-        if self.exist_rule(id):
-            return self.rules[id]
+    def find_subtask_info(self, id):
+        if self.exist_subtask_info(id):
+            return self.subtask_infos[id]
         else:
-            raise Exception("No flow rules : ", id)
+            raise Exception("No flow subtask_infos : ", id)
         
-    def pop_rule(self, id):
-        rule = self.find_rule(id)
-        self.del_rule(id)
+    def pop_subtask_info(self, id):
+        subtask_info = self.find_subtask_info(id)
+        self.del_subtask_info(id)
 
-        return rule
+        return subtask_info
     
     def get_backlogs(self):
         links = {}
-        for rule in self.rules:
-            subtask: DNNSubtask = self.rules[rule]
+        for subtask_info in self.subtask_infos:
+            subtask: DNNSubtask = self.subtask_infos[subtask_info]
 
-            link = rule.split("_")[2] + "->" + rule.split("_")[3]
+            link = subtask_info.split("_")[2] + "->" + subtask_info.split("_")[3]
 
-            if rule in links:
+            if subtask_info in links:
                 links[link] += subtask.get_backlog()
             else:
                 links[link] = subtask.get_backlog()
@@ -48,4 +48,4 @@ class VirtualQueue:
         return links
         
     def __str__(self):
-        return str(self.rules)
+        return str(self.subtask_infos)

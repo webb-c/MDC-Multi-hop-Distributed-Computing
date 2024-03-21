@@ -34,7 +34,7 @@ class SubtaskInfo(JobInfo):
         return self._transfer
         
     def get_subtask_id(self):
-        return self._delimeter.join([self.get_job_id(), self._source.to_string(), self._destination.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0
+        return self._delimeter.join([self.get_job_id(), self._source.to_string(), self._destination.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
     
     def is_transmission(self):
         return self._source.is_same_layer(self._destination)

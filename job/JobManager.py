@@ -42,7 +42,7 @@ class JobManager:
 
     def is_subtask_exists(self, output: DNNOutput):
         previous_subtask_info = output.get_subtask_info()
-        if self._virtual_queue.exist_rule(previous_subtask_info.get_subtask_id()):
+        if self._virtual_queue.exist_subtask_info(previous_subtask_info.get_subtask_id()):
             return True
         else:
             return False
@@ -54,7 +54,7 @@ class JobManager:
         previous_subtask_info = output.get_subtask_info()
         if previous_subtask_info.get_job_type() == "dnn":
             # get next destination
-            subtask: DNNSubtask = self._virtual_queue.find_rule(previous_subtask_info.get_subtask_id())
+            subtask: DNNSubtask = self._virtual_queue.find_subtask_info(previous_subtask_info.get_subtask_id())
 
             # get output data == get current subtask's input
             data = output.get_output()
@@ -64,7 +64,7 @@ class JobManager:
 
             return dnn_output
 
-    # add rule based SubtaskInfo
+    # add subtask_info based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
         print(subtask_info._source.to_string())
         print(subtask_info._destination.to_string())
@@ -79,7 +79,7 @@ class JobManager:
             subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_sequence()]
             subtask = DNNSubtask(subtask_info, subtask_model)
 
-        success_add_rule = self._virtual_queue.add_rule(subtask_id, subtask)
+        success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_id, subtask)
             
-        if not success_add_rule:
+        if not success_add_subtask_info:
             raise Exception(f"Subtask already exists. : {subtask_info.get_subtask_id()}")
