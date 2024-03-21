@@ -114,18 +114,7 @@ class LayeredGraph:
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
 
         return path
-    
-    def get_neighbors(self, layer_node_ip: str):
-        neighbors = []
-        for layer in range(self._max_layer_depth):
-            layer_node = LayerNode(layer_node_ip, layer)
-
-            neighbor = self._layered_graph[layer_node]
-
-            neighbors += neighbor
-
-        return neighbors
-    
+     
     def get_links(self, layer_node_ip: str):
         links = []
         for layer in range(self._max_layer_depth):
@@ -133,7 +122,6 @@ class LayeredGraph:
 
             neighbors = self._layered_graph[layer_node]
             for neighbor in neighbors:
-                neighbors += neighbor
                 link = LayerNodePair(layer_node, neighbor)
 
                 links.append(link)
