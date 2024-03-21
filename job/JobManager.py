@@ -66,20 +66,14 @@ class JobManager:
 
     # add subtask_info based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
-        print(subtask_info._source.to_string())
-        print(subtask_info._destination.to_string())
         if subtask_info.is_transmission():
-            print("tra")
-            subtask_id = subtask_info.get_subtask_id()
             subtask = DNNSubtask(subtask_info, None)
 
         elif subtask_info.is_computing():
-            print("is_computing")
-            subtask_id = subtask_info.get_subtask_id()
             subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_sequence()]
             subtask = DNNSubtask(subtask_info, subtask_model)
 
-        success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_id, subtask)
+        success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_info, subtask)
             
         if not success_add_subtask_info:
             raise Exception(f"Subtask already exists. : {subtask_info.get_subtask_id()}")

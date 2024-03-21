@@ -1,5 +1,5 @@
 from job import JobInfo
-from layeredgraph import LayerNode
+from layeredgraph import LayerNode, LayerNodePair
 
 # info class for making subtask
 class SubtaskInfo(JobInfo):
@@ -36,8 +36,20 @@ class SubtaskInfo(JobInfo):
     def get_subtask_id(self):
         return self._delimeter.join([self.get_job_id(), self._source.to_string(), self._destination.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
     
+    def get_link(self):
+        return LayerNodePair(self._source, self._destination)
+    
     def is_transmission(self):
         return self._source.is_same_layer(self._destination)
     
     def is_computing(self):
         return self._source.is_same_node(self._destination)
+    
+    def __hash__(self):
+        return hash(self.get_subtask_id())
+
+    def __eq__(self, other):
+        return self.get_subtask_id() == other.get_subtask_id()
+
+    def __ne__(self, other):
+        return not(self == other)

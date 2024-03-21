@@ -53,8 +53,6 @@ class MDC(Program):
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
 
-        print(subtask_info)
-
         self.job_manager.add_subtask(subtask_info)
     
     def get_network_info(self, topic, data, publisher):
