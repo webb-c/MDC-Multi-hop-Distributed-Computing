@@ -49,8 +49,7 @@ class Sender(MDC):
 
         while True:
             self._frame = c.copy()
-            if cv2.waitKey(int(1000 / 24)) == ord('q'):
-                break
+            time.sleep(1 / 24)
 
         self._map_file.close()
         self._memory.unlink()
