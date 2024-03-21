@@ -32,9 +32,8 @@ class Dijkstra:
                 break
 
             # For each neighbor of the current node
-            for neighbor_string in layered_graph[current_node]:
-                print("neighbor_string", neighbor_string)
-                neighbor = LayerNode(neighbor_string.split("-")[0], neighbor_string.split("-")[1])
+            for neighbor in layered_graph[current_node]:
+                print("neighbor_string", neighbor)
                 neighbor_pair = LayerNodePair(current_node, neighbor)
                 neighbor_pair_str = neighbor_pair
 
