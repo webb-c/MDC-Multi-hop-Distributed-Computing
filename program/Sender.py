@@ -61,6 +61,9 @@ class Sender(MDC):
         streamer_thread.start()
 
         while True:
+            if not self.check_job_manager_exists() and not self.check_network_info_exists():
+                time.sleep(1.0)
+                continue
             # with any frame drop logic
             time.sleep(0.1)
             if not self.set_job_info_time():
