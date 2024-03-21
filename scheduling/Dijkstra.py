@@ -10,12 +10,6 @@ class Dijkstra:
     def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, layered_graph_backlog, layer_nodes):
         distances = {node: float('infinity') for node in layer_nodes}
         previous_nodes = {node: None for node in layer_nodes}
-
-        print("source_node", source_node)
-        print("destination_node", destination_node)
-        print("layered_graph", layered_graph)
-        print("layered_graph_backlog", layered_graph_backlog)
-        print("layer_nodes", layer_nodes)
         
         # Set distance for the source node to zero
         distances[source_node] = 0
@@ -24,8 +18,6 @@ class Dijkstra:
 
         while pq:
             current_distance, current_node = heapq.heappop(pq)
-            print("current_distance", current_distance)
-            print("current_node", current_node)
 
             # Stop if the destination is reached
             if current_node == destination_node:
@@ -33,7 +25,6 @@ class Dijkstra:
 
             # For each neighbor of the current node
             for neighbor in layered_graph[current_node]:
-                print("neighbor_string", neighbor)
                 neighbor_pair = LayerNodePair(current_node, neighbor)
                 neighbor_pair_str = neighbor_pair
 
@@ -50,7 +41,6 @@ class Dijkstra:
         # Path reconstruction from source to destination
         path = []
         current = destination_node
-        print(previous_nodes)
         while current is not None and current in previous_nodes:
             path.append(current)
             current = previous_nodes[current]
