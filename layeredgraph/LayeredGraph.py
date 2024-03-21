@@ -74,7 +74,7 @@ class LayeredGraph:
                 self._layer_nodes.append(source)
 
                 if source not in self._layered_graph:
-                    self._layered_graph = []
+                    self._layered_graph[source] = []
 
                 for destination_ip in self._network[source_ip]:
                     destination = LayerNode(destination_ip, layer)
@@ -92,7 +92,7 @@ class LayeredGraph:
                 destination = LayerNode(source_ip, layer + 1)
 
                 if source not in self._layered_graph:
-                    self._layered_graph = []
+                    self._layered_graph[source] = []
 
                 self._layered_graph[source].append(destination)
 
