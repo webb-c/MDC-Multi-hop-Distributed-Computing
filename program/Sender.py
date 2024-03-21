@@ -6,7 +6,6 @@ import pickle
 import time
 from threading import Thread
 import numpy as np
-import cv2
 import posix_ipc
 import mmap
 
