@@ -38,10 +38,12 @@ class VirtualQueue:
         for rule in self.rules:
             subtask: DNNSubtask = self.rules[rule]
 
+            link = rule.split("_")[1] + "->" + rule.split("_")[2]
+
             if rule in links:
-                links[rule] += subtask.get_backlog()
+                links[link] += subtask.get_backlog()
             else:
-                links[rule] = subtask.get_backlog()
+                links[link] = subtask.get_backlog()
 
         return links
         
