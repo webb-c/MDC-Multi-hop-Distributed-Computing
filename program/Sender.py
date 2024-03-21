@@ -49,7 +49,7 @@ class Sender(MDC):
 
         while True:
             self._frame = c.copy()
-            time.sleep(1 / 24)
+            time.sleep(1 / 30)
 
         self._map_file.close()
         self._memory.unlink()
