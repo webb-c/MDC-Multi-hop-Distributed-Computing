@@ -5,12 +5,13 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from program import Program
 from job import *
 from communication import *
-import pickle
-
+from job.JobManager import JobManager
 from utils.utils import get_ip_address
+
 import paho.mqtt.publish as publish
 import MQTTclient
-from job.JobManager import JobManager
+import pickle
+import time
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs):
@@ -53,6 +54,8 @@ class MDC(Program):
 
             # send NetworkInfo byte to source ip (response)
             self._controller_publisher.publish("mdc/network_info", node_info_bytes)
+
+            time.sleep(10)
 
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
