@@ -47,7 +47,7 @@ class MDC(Program):
     # request network information to network controller
     # sending node info.
     def request_network_info(self):
-        while self._network_info != None:
+        while self._network_info == None:
             print("Requested network info..")
             node_info_bytes = pickle.dumps(self._node_info)
 
