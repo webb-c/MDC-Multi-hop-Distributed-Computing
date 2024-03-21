@@ -19,6 +19,8 @@ class LayeredGraph:
         self._scheduling_algorithm = None
         self._previous_update_time = time.time()
 
+        self._max_layer_depth = 0
+
         self.init_graph()
         self.init_algorithm()
 
@@ -64,35 +66,35 @@ class LayeredGraph:
         self._layered_graph_backlog[link] = backlog
 
     def init_graph(self):
-        max_job_length = max([len(job["split_points"]) for job_name, job in self._network_info.get_jobs().items()])
+        self._max_layer_depth = max([len(job["split_points"]) for job_name, job in self._network_info.get_jobs().items()])
 
-        for layer in range(max_job_length):
+        for layer in range(self._max_layer_depth):
             for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 self._layer_nodes.append(source)
 
+                if source not in self._layered_graph:
+                    self._layered_graph = []
+
                 for destination_ip in self._network[source_ip]:
                     destination = LayerNode(destination_ip, layer)
 
-                    if source in self._layered_graph:
-                        self._layered_graph[source].append(destination)
-                    else:
-                        self._layered_graph[source] = [destination]
+                    self._layered_graph[source].append(destination)
 
                     link = LayerNodePair(source, destination)
 
                     self._layer_node_pairs.append(link)
                     self._layered_graph_backlog[link] = 0
 
-        for layer in range(max_job_length - 1):
+        for layer in range(self._max_layer_depth - 1):
             for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 destination = LayerNode(source_ip, layer + 1)
 
-                if source in self._layered_graph:
-                    self._layered_graph[source].append(destination)
-                else:
-                    self._layered_graph[source] = [destination]
+                if source not in self._layered_graph:
+                    self._layered_graph = []
+
+                self._layered_graph[source].append(destination)
 
                 link = LayerNodePair(source, destination)
 
@@ -112,5 +114,31 @@ class LayeredGraph:
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
 
         return path
+    
+    def get_neighbors(self, layer_node_ip: str):
+        neighbors = []
+        for layer in range(self._max_layer_depth):
+            layer_node = LayerNode(layer_node_ip, layer)
+
+            neighbor = self._layered_graph[layer_node]
+
+            neighbors += neighbor
+
+        return neighbors
+    
+    def get_links(self, layer_node_ip: str):
+        links = []
+        for layer in range(self._max_layer_depth):
+            layer_node = LayerNode(layer_node_ip, layer)
+
+            neighbors = self._layered_graph[layer_node]
+            for neighbor in neighbors:
+                neighbors += neighbor
+                link = LayerNodePair(layer_node, neighbor)
+
+                links.append(link)
+
+        return links
+    
     
 

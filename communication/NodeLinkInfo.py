@@ -1,8 +1,9 @@
+from typing import Dict
 from layeredgraph import LayerNodePair
 
 # info class for response sync
 class NodeLinkInfo:
-    def __init__(self, ip: str, links):
+    def __init__(self, ip: str, links: Dict):
         self._ip = ip
         self._links = links
 

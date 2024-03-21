@@ -27,7 +27,7 @@ class MDC(Program):
         self.topic_dispatcher = {
             "job/dnn": self.handle_dnn,
             "job/subtask_info": self.handle_subtask_info,
-            "mdc/network_info" : self.get_network_info,
+            "mdc/network_info" : self.handle_network_info,
             "mdc/node_info": self.handle_request_backlog,
         }
 
@@ -39,7 +39,8 @@ class MDC(Program):
         }
 
         self._network_info = None
-        self.job_manager = None
+        self._job_manager = None
+        self._neighbors = None
 
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher, self.topic_dispatcher_checker)
 
@@ -60,16 +61,17 @@ class MDC(Program):
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
 
-        self.job_manager.add_subtask(subtask_info)
+        self._job_manager.add_subtask(subtask_info)
     
-    def get_network_info(self, topic, data, publisher):
+    def handle_network_info(self, topic, data, publisher):
         self._network_info: NetworkInfo = pickle.loads(data)
-        self.job_manager = JobManager(self._address, self._network_info)
+        self._job_manager = JobManager(self._address, self._network_info)
 
         print(f"Succesfully got network info.")
 
+
     def handle_request_backlog(self, topic, data, publisher):
-        links = self.job_manager.get_backlogs()
+        links = self._job_manager.get_backlogs()
         print(links)
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
@@ -86,11 +88,11 @@ class MDC(Program):
             return True
         
     def check_job_manager_exists(self, data = None):
-        if self.job_manager == None:
+        if self._job_manager == None:
             print("The job_manager is not initialized.")
             return False
         
-        elif self.job_manager != None:
+        elif self._job_manager != None:
             return True
 
     def handle_dnn(self, topic, data, publisher):
@@ -99,7 +101,7 @@ class MDC(Program):
         assert previous_dnn_output.is_destination(self._address), "Job / Response's destination should be matched."
 
         # terminal node
-        if previous_dnn_output.is_terminal_destination(self._address) and not self.job_manager.is_subtask_exists(previous_dnn_output): 
+        if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
             subtask_info = previous_dnn_output.get_subtask_info()
             subtask_info_bytes = pickle.dumps(subtask_info)
 
@@ -108,7 +110,7 @@ class MDC(Program):
 
         else: 
             # if this is intermidiate node
-            dnn_output = self.job_manager.run(previous_dnn_output)
+            dnn_output = self._job_manager.run(previous_dnn_output)
             subtask_info = dnn_output.get_subtask_info()
 
             destination = subtask_info.get_destination()

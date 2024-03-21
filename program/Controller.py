@@ -78,6 +78,11 @@ class Controller(Program):
         node_link_info: NodeLinkInfo = pickle.loads(payload)
         links = node_link_info.get_links()
 
+        total_links = self._layered_graph.get_links(node_link_info.get_ip())
+
+        for link in total_links:
+            links.setdefault(link, 0)
+
         self._layered_graph.set_graph(links)
 
     def handle_request_scheduling(self, topic, payload, publisher):
