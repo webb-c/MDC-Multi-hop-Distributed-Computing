@@ -74,7 +74,7 @@ class MDC(Program):
         # send NodeLinkInfo byte to source ip (response)
         self._controller_publisher.publish("mdc/node_info", node_link_info_bytes)
 
-    def check_network_info_exists(self, data):
+    def check_network_info_exists(self, data = None):
         if self._network_info == None:
             print("The node is not initialized.")
             return False
@@ -82,7 +82,7 @@ class MDC(Program):
         elif self._network_info != None:
             return True
         
-    def check_job_manager_exists(self, data):
+    def check_job_manager_exists(self, data = None):
         if self.job_manager == None:
             print("The job_manager is not initialized.")
             return False
