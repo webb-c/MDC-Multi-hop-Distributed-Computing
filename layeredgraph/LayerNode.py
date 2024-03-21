@@ -37,7 +37,7 @@ class LayerNode:
         return self.to_string()
 
     def __eq__(self, other):
-        return self.to_string() == other.self.to_string()
+        return self.to_string() == other.to_string()
 
     def __ne__(self, other):
         return not(self == other)
