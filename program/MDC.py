@@ -31,9 +31,10 @@ class MDC(Program):
         }
 
         self.topic_dispatcher_checker = {
-            "job/dnn": [self.check_network_info_exists],
-            "job/subtask_info": [self.check_job_manager_exists],
-            "mdc/node_info": [self.check_job_manager_exists],
+            "job/dnn": [(self.check_network_info_exists, True)],
+            "job/subtask_info": [(self.check_job_manager_exists, True)],
+            "mdc/network_info": [(self.check_job_manager_exists, False)],
+            "mdc/node_info": [(self.check_job_manager_exists, True)],
         }
 
         self._network_info = None
@@ -46,10 +47,12 @@ class MDC(Program):
     # request network information to network controller
     # sending node info.
     def request_network_info(self):
-        node_info_bytes = pickle.dumps(self._node_info)
+        while self._network_info != None:
+            print("Requested network info..")
+            node_info_bytes = pickle.dumps(self._node_info)
 
-        # send NetworkInfo byte to source ip (response)
-        self._controller_publisher.publish("mdc/network_info", node_info_bytes)
+            # send NetworkInfo byte to source ip (response)
+            self._controller_publisher.publish("mdc/network_info", node_info_bytes)
 
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)

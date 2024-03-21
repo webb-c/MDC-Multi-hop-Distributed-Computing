@@ -44,9 +44,9 @@ class Program:
             message = self.queue.get()  
             if message:
                 callback = self.topic_dispatcher.get(message.topic, self.handle_unknown_topic)
-                callback_checkers = self.topic_dispatcher_checker.get(message.topic, [self.check_empty_checker])
+                callback_checkers, return_target = self.topic_dispatcher_checker.get(message.topic, [(self.check_empty_checker, True)])
                 # if all callback_checkers return True => pass unit test
-                if sum([callback_checker(message.payload) for callback_checker in callback_checkers]) == len(callback_checkers):
+                if sum([callback_checker(message.payload)==return_target for callback_checker in callback_checkers]) == len(callback_checkers):
                     callback_thread = Thread(target=callback, args=(message.topic, message.payload, self.publisher, ))
                     callback_thread.start()
 
