@@ -28,9 +28,6 @@ class JobInfo:
     def set_start_time(self, start_time: float):
         self._start_time = start_time
 
-    def __eq__(self, other):
-        return self.get_job_id() == other.get_job_id()
-
     def __str__(self):
         return self.get_job_id()
     
