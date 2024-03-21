@@ -1,25 +1,36 @@
 from typing import Dict
 from job import DNNSubtask, SubtaskInfo
 
+import threading
+
 class VirtualQueue:
     def __init__(self, address):
         self.address = address
         self.subtask_infos: Dict[SubtaskInfo, DNNSubtask] = dict()
+        self.mutex = threading.Lock()
 
     def exist_subtask_info(self, id):
-        return id in self.subtask_infos
+        self.mutex.acquire()
+        result = id in self.subtask_infos
+        self.mutex.release()
+        return result
 
     def add_subtask_info(self, subtask_info, subtask: DNNSubtask):
+        self.mutex.acquire()
         # ex) "192.168.1.5", Job
         if self.exist_subtask_info(subtask_info):
+            self.mutex.release()
             return False
         
         else:
             self.subtask_infos[subtask_info] = subtask
+            self.mutex.release()
             return True
 
     def del_subtask_info(self, subtask_info):
+        self.mutex.acquire()
         del self.subtask_infos[subtask_info]
+        self.mutex.release()
     
     def find_subtask_info(self, subtask_info):
         if self.exist_subtask_info(subtask_info):
@@ -35,6 +46,7 @@ class VirtualQueue:
     
     def get_backlogs(self):
         links = {}
+        self.mutex.acquire()
         for subtask_info in self.subtask_infos:
             subtask: DNNSubtask = self.subtask_infos[subtask_info]
 
@@ -44,6 +56,8 @@ class VirtualQueue:
                 links[link] += subtask.get_backlog()
             else:
                 links[link] = subtask.get_backlog()
+
+        self.mutex.release()
 
         return links
         
