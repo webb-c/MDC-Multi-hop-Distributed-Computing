@@ -25,6 +25,7 @@ class LayeredGraph:
     def set_graph(self, links):
         self._previous_update_time = time.time()
         for link in links:
+            link: LayerNodePair
             self.set_link(link, links[link])
         
     def update_graph(self):
@@ -35,22 +36,22 @@ class LayeredGraph:
 
         for link in self._layer_node_pairs:
             link: LayerNodePair
-            source_node_ip = link.get_source().get_ip()
-            destination_node_ip = link.get_destinatioin().get_ip()
+            source_node = link.get_source()
+            destination_node = link.get_destinatioin()
 
-            destinations: Dict = links_job_num.setdefault(source_node_ip, {})
-            destinations.setdefault(destination_node_ip, 0)
+            destinations: Dict = links_job_num.setdefault(source_node, {})
+            destinations.setdefault(destination_node, 0)
 
             if self._layered_graph_backlog[link] > 0:
-                destinations[destination_node_ip] += 1
+                destinations[destination_node] += 1
 
-        for source in self._layer_node_pairs:
+        for link in self._layer_node_pairs:
             link: LayerNodePair
-            source_node_ip = link.get_source().get_ip()
-            destination_node_ip = link.get_destinatioin().get_ip()
+            source_node = link.get_source()
+            destination_node = link.get_destinatioin()
             
-            link_job_num = links_job_num[source_node_ip][destination_node_ip]
-            capacity = self._network_info.get_capacity()[source_node_ip][destination_node_ip]
+            link_job_num = links_job_num[source_node][destination_node]
+            capacity = self._network_info.get_capacity()[source_node][destination_node]
 
             if link_job_num > 0:
                 job_computing_delta = elapsed_time * capacity / link_job_num
@@ -59,7 +60,7 @@ class LayeredGraph:
 
         self._previous_update_time = time.time()
 
-    def set_link(self, link: str, backlog: float):
+    def set_link(self, link: LayerNodePair, backlog: float):
         self._layered_graph_backlog[link] = backlog
 
     def init_graph(self):
