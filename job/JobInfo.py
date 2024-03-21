@@ -8,11 +8,13 @@ class JobInfo:
         self._job_name = job_name
         self._start_time = time.time_ns()
 
+        self._delimeter = "_"
+
     def get_source_ip(self):
         return self._source_ip
 
     def get_job_id(self):
-        return f"{self._job_name}_{self._start_time}"
+        return self._delimeter.join([self._job_name, self._start_time])
     
     def get_terminal_destination(self):
         return self._terminal_destination
@@ -25,3 +27,12 @@ class JobInfo:
     
     def set_start_time(self, start_time: float):
         self._start_time = start_time
+
+    def __eq__(self, other):
+        return self.get_job_id() == other.get_job_id()
+
+    def __str__(self):
+        return self.get_job_id()
+    
+    def __repr__(self):
+        return self.get_job_id()

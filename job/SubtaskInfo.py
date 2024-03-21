@@ -10,8 +10,6 @@ class SubtaskInfo(JobInfo):
         self._destination = destination
         self._computing = computing
         self._transfer = transfer
-        
-        self._delimeter = "_"
 
         super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name())
 
