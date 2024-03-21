@@ -33,6 +33,7 @@ class MDC(Program):
         self.topic_dispatcher_checker = {
             "job/dnn": [self.check_network_info_exists],
             "job/subtask_info": [self.check_job_manager_exists],
+            "mdc/node_info": [self.check_job_manager_exists],
         }
 
         self._network_info = None
@@ -62,11 +63,7 @@ class MDC(Program):
         print(f"Succesfully got network info.")
 
     def handle_request_backlog(self, topic, data, publisher):
-        try:
-            links = self.job_manager.get_backlogs()
-        except Exception as e:  # 예외가 발생했을 때 실행됨
-            print('예외가 발생했습니다.', e)
-            return
+        links = self.job_manager.get_backlogs()
         print(links)
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
