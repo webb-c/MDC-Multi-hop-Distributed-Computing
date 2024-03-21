@@ -30,6 +30,18 @@ class LayerNode:
     def to_string(self) -> str:
         return f"{self._ip}-{self._layer}"
     
+    def __hash__(self):
+        return hash(self.to_string())
+    
+    def __str__(self):
+        return self.to_string()
+
+    def __eq__(self, other):
+        return self.self.to_string() == other.self.to_string()
+
+    def __ne__(self, other):
+        return not(self == other)
+    
     def __lt__(self, other):
         return self.get_ip() < other.get_ip()
     

@@ -13,3 +13,15 @@ class LayerNodePair:
     
     def get_destinatioin(self):
         return self._destination
+    
+    def __hash__(self):
+        return hash(self.to_string())
+    
+    def __str__(self):
+        return self.to_string()
+
+    def __eq__(self, other):
+        return self.self.to_string() == other.self.to_string()
+
+    def __ne__(self, other):
+        return not(self == other)
