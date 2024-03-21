@@ -11,7 +11,7 @@ class LayerNodePair:
     def get_source(self):
         return self._source
     
-    def get_destinatioin(self):
+    def get_destination(self):
         return self._destination
     
     def __hash__(self):

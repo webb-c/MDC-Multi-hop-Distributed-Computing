@@ -36,22 +36,22 @@ class LayeredGraph:
 
         for link in self._layer_node_pairs:
             link: LayerNodePair
-            source_node = link.get_source()
-            destination_node = link.get_destinatioin()
+            source_node_ip = link.get_source().get_ip()
+            destination_node_ip = link.get_destination().get_ip()
 
-            destinations: Dict = links_job_num.setdefault(source_node, {})
-            destinations.setdefault(destination_node, 0)
+            destinations: Dict = links_job_num.setdefault(source_node_ip, {})
+            destinations.setdefault(destination_node_ip, 0)
 
             if self._layered_graph_backlog[link] > 0:
-                destinations[destination_node] += 1
+                destinations[destination_node_ip] += 1
 
-        for link in self._layer_node_pairs:
+        for source in self._layer_node_pairs:
             link: LayerNodePair
-            source_node = link.get_source()
-            destination_node = link.get_destinatioin()
+            source_node_ip = link.get_source().get_ip()
+            destination_node_ip = link.get_destination().get_ip()
             
-            link_job_num = links_job_num[source_node][destination_node]
-            capacity = self._network_info.get_capacity()[source_node][destination_node]
+            link_job_num = links_job_num[source_node_ip][destination_node_ip]
+            capacity = self._network_info.get_capacity()[source_node_ip][destination_node_ip]
 
             if link_job_num > 0:
                 job_computing_delta = elapsed_time * capacity / link_job_num
