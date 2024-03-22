@@ -87,7 +87,7 @@ class Sender(MDC):
 
         while True:
             self._frame = c.copy()
-            time.sleep(1 / 1)
+            time.sleep(1 / 30)
 
         self._map_file.close()
         self._memory.unlink()
@@ -135,7 +135,7 @@ class Sender(MDC):
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
-        return 0.1
+        return 0.5
 
 if __name__ == '__main__':
     sub_config = {
