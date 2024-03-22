@@ -76,7 +76,7 @@ def split_model(model, split_point) -> torch.nn.Module:
 
 def load_model(model_name) -> torch.nn.Module:
 
-    available_model_list = ["yolov5", "resnet-18", "resnet-50"]
+    available_model_list = ["yolov5", "resnet-18", "resnet-50", "mobilenet_v2"]
 
     assert model_name in available_model_list, f"Model must be in {available_model_list}."
 
