@@ -12,7 +12,6 @@ import paho.mqtt.publish as publish
 import MQTTclient
 import pickle
 import time
-import threading
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs):

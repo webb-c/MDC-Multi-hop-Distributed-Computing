@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 import pickle
 import time
 from threading import Thread
+import paho.mqtt.publish as publish
 import numpy as np
 import posix_ipc
 import mmap
@@ -64,9 +65,17 @@ class Sender(MDC):
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
             job_id = subtask_info.get_job_id()
             input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]).float().view(1, TARGET_DEPTH, TARGET_HEIGHT, TARGET_WIDTH), subtask_info)
-            self._job_manager.run(input_frame)
+            dnn_output = self._job_manager.run(input_frame)
 
-            print(f"run {job_id} : {subtask_info.get_subtask_id()}")
+            subtask_info = dnn_output.get_subtask_info()
+
+            destination = subtask_info.get_destination()
+
+            dnn_output_bytes = pickle.dumps(dnn_output)
+                
+            # send job to next node
+            publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination)
+       
             
     def stream_player(self):
         c = np.ndarray(self._shape, dtype=np.uint8, buffer=self._map_file)
