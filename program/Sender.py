@@ -71,6 +71,8 @@ class Sender(MDC):
 
             destination_ip = subtask_info.get_destination().get_ip()
 
+            print("destination_ip", destination_ip)
+
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
             # send job to next node
