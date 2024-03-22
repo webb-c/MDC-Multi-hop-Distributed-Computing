@@ -57,13 +57,14 @@ class Controller(Program):
         callback_thread.start()
 
     def garbage_job_collector(self):
+        collect_garbage_job_time = self._network_info.get_collect_garbage_job_time()
         while True:
-            time.sleep(self._network_info.get_collect_garbage_job_time())
+            time.sleep(collect_garbage_job_time)
 
             cur_time = time.time_ns()
 
             self._job_list_mutex.acquire()
-            keys_to_delete = [job_id for job_id, start_time_nano in self._job_list.items() if cur_time - start_time_nano >= 10 * 1_000_000_000]
+            keys_to_delete = [job_id for job_id, start_time_nano in self._job_list.items() if cur_time - start_time_nano >= collect_garbage_job_time * 1_000_000_000]
             for k in keys_to_delete:
                 del self._job_list[k]
 

@@ -56,10 +56,11 @@ class JobManager:
         callback_thread.start()
 
     def garbage_job_collector(self):
+        collect_garbage_job_time = self._network_info.get_collect_garbage_job_time()
         while True:
-            time.sleep(self._network_info.get_collect_garbage_job_time())
+            time.sleep(collect_garbage_job_time)
 
-            self._virtual_queue.garbage_job_collector()
+            self._virtual_queue.garbage_job_collector(collect_garbage_job_time)
 
         
     def get_backlogs(self):

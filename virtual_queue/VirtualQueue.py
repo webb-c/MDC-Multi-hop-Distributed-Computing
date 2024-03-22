@@ -10,10 +10,10 @@ class VirtualQueue:
         self.subtask_infos: Dict[SubtaskInfo, Tuple[DNNSubtask, int]] = dict()
         self.mutex = threading.Lock()
 
-    def garbage_job_collector(self):
+    def garbage_job_collector(self, collect_garbage_job_time: int):
         cur_time = time.time_ns()
         self.mutex.acquire()
-        keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= 10 * 1_000_000_000]
+        keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= collect_garbage_job_time * 1_000_000_000]
         for k in keys_to_delete:
             del self.subtask_infos[k]
 
