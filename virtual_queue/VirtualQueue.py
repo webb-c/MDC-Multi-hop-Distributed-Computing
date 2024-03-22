@@ -21,9 +21,7 @@ class VirtualQueue:
             return False
         
         else:
-            print(subtask_info.get_subtask_id())
             self.subtask_infos[subtask_info] = subtask
-            print(self.subtask_infos)
             return True
 
     def del_subtask_info(self, subtask_info):
@@ -49,12 +47,12 @@ class VirtualQueue:
     def get_backlogs(self):
         links = {}
         self.mutex.acquire()
-        for subtask_info in self.subtask_infos:
-            subtask: DNNSubtask = self.subtask_infos[subtask_info]
+        for subtask_info, subtask in self.subtask_infos.items():
+            subtask: DNNSubtask
 
             link = subtask_info.get_link()
 
-            if subtask_info in links:
+            if link in links:
                 links[link] += subtask.get_backlog()
             else:
                 links[link] = subtask.get_backlog()
