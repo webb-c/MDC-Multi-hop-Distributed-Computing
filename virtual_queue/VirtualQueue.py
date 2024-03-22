@@ -23,6 +23,7 @@ class VirtualQueue:
         else:
             print(subtask_info.get_subtask_id())
             self.subtask_infos[subtask_info] = subtask
+            print(self.subtask_infos)
             return True
 
     def del_subtask_info(self, subtask_info):
