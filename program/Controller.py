@@ -129,14 +129,14 @@ class Controller(Program):
             destination_layer_node: LayerNode = path[i + 1]
             future_destination_layer_node: LayerNode = path[i + 2] if i + 2 < len(path) else None
 
+            if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
+                model_index += 1
+
             computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][model_index]
             transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][model_index]
 
             subtask_info = SubtaskInfo(job_info, model_index, source_layer_node, destination_layer_node, future_destination_layer_node, computing, transfer)
             subtask_info_bytes = pickle.dumps(subtask_info)
-
-            if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
-                model_index += 1
 
             # send SubtaskInfo byte to source ip
             publish.single("job/subtask_info", subtask_info_bytes, hostname=source_layer_node.get_ip())
