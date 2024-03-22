@@ -3,7 +3,7 @@ import subprocess, socket, re, os
 import csv
 
 import torch
-from torchvision.models import resnet18, ResNet18_Weights
+from torchvision.models import resnet18
 
 def get_ip_address(interface_name=["eth0"]):
     # check os
@@ -74,30 +74,6 @@ def split_model(model, split_point) -> torch.nn.Module:
 
     return splited_model
 
-def _split_model(self):
-    """ object: backbone으로 사용할 모델을 로드하고 layer_idx를 기준으로 2개의 부분으로 모델을 나누어 반환합니다."""
-    
-    current_idx = 0
-    part1_layers, part2_layers = [], []
-    
-    def _recursive_add_layers(module):
-        nonlocal current_idx
-        for child in module.children():
-            if len(list(child.children())) == 0 : 
-                if current_idx <= self.layer_idx:
-                    part1_layers.append(child)
-                else:
-                    part2_layers.append(child)
-                current_idx += 1
-            else: 
-                _recursive_add_layers(child)            
-        return
-
-    _recursive_add_layers(backbone)
-    part1_model, part2_model = nn.Sequential(*part1_layers), nn.Sequential(*part2_layers[:-1])
-    
-    return part1_model, part2_model
-
 def load_model(model_name) -> torch.nn.Module:
 
     available_model_list = ["yolov5", "resnet-18", "resnet-50"]
@@ -108,7 +84,7 @@ def load_model(model_name) -> torch.nn.Module:
         return None # TODO
     
     elif model_name == "resnet-18":
-        model = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
+        model = resnet18(pretrained=True)
         model.eval()
         return model # TODO
     
