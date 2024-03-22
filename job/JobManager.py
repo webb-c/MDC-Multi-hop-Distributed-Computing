@@ -72,7 +72,7 @@ class JobManager:
         previous_subtask_info = output.get_subtask_info()
         if previous_subtask_info.get_job_type() == "dnn":
             # get next destination
-            subtask: DNNSubtask = self._virtual_queue.find_subtask_info(previous_subtask_info)
+            subtask: DNNSubtask = self._virtual_queue.pop_subtask_info(previous_subtask_info)
 
             # get output data == get current subtask's input
             data = output.get_output()
