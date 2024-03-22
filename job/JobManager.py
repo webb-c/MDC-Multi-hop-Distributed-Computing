@@ -27,12 +27,12 @@ class JobManager:
             if job["job_type"] == "dnn":
                 # load whole dnn model
                 model_name = job["model_name"]
-                model = load_model(model_name).eval()
+                model, flatten_index = load_model(model_name).eval()
 
                 # init model list and split model
                 self._models[job_name] = []
                 for split_point in job["split_points"]:
-                    subtask : torch.nn.Module = split_model(model, split_point)
+                    subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
                     self._models[job_name].append(subtask)
                     print(subtask)
 

@@ -73,9 +73,12 @@ def save_latency(file_name, latency):
 #     splited_model = torch.nn.Sequential(*layers)
 #     return splited_model
         
-def split_model(model: torch.nn.Module, split_point) -> torch.nn.Module:
+def split_model(model: torch.nn.Module, split_point, flatten_index: int) -> torch.nn.Module:
     start, end = split_point
-    splited_model = torch.nn.Sequential(*list(model.children())[start:end])
+    layers = list(model.children())
+    if flatten_index != None:
+        layers.insert(flatten_index, torch.nn.Flatten())
+    splited_model = torch.nn.Sequential(*layers[start:end])
     print(len(list(model.children())))
     return splited_model
 
@@ -91,7 +94,7 @@ def load_model(model_name) -> torch.nn.Module:
     elif model_name == "resnet-18":
         model = resnet18(pretrained=True)
         model.eval()
-        return model # TODO
+        return model, -1 # TODO
     
     elif model_name == "resnet-50":
         return None # TODO
@@ -99,4 +102,4 @@ def load_model(model_name) -> torch.nn.Module:
     elif model_name == "mobilenet_v2":
         model = mobilenet_v2(pretrained=True, )
         model.eval()
-        return model # TODO
+        return model, -1 # TODO
