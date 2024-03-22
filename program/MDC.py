@@ -1,4 +1,4 @@
-import sys, os, json
+import sys, os
  
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
@@ -12,6 +12,7 @@ import paho.mqtt.publish as publish
 import MQTTclient
 import pickle
 import time
+import threading
 
 class MDC(Program):
     def __init__(self, sub_config, pub_configs):
@@ -74,7 +75,7 @@ class MDC(Program):
         links = self._job_manager.get_backlogs()
         if len(links) == 0:
             return
-        print(links)
+
         node_link_info = NodeLinkInfo(self._address, links)
         node_link_info_bytes = pickle.dumps(node_link_info)
 
@@ -137,5 +138,5 @@ if __name__ == '__main__':
     pub_configs = [
     ]
     
-    ex = MDC(sub_config=sub_config, pub_configs=pub_configs)
-    ex.start()
+    mdc = MDC(sub_config=sub_config, pub_configs=pub_configs)
+    mdc.start()

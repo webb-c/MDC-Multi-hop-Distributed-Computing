@@ -6,6 +6,9 @@ from utils import *
 from communication import *
 from virtual_queue import VirtualQueue
 
+import threading
+import time
+
 class JobManager:
     def __init__(self, address, network_info: NetworkInfo):
         self._models : Dict[str, List] = dict()
@@ -46,6 +49,17 @@ class JobManager:
             return True
         else:
             return False
+        
+    def init_garbage_job_collector(self):
+        callback_thread = threading.Thread(target=self.garbage_job_collector, args=())
+        callback_thread.start()
+
+    def garbage_job_collector(self):
+        while True:
+            time.sleep(self._network_info.get_collect_garbage_job_time())
+
+            self._virtual_queue.garbage_job_collector()
+
         
     def get_backlogs(self):
         return self._virtual_queue.get_backlogs()

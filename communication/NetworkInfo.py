@@ -8,6 +8,7 @@ class NetworkInfo:
         self._capacity = self._network_config["capacity"]
         self._scheduling_algorithm: str = self._network_config["scheduling_algorithm"]
         self._sync_time: float = self._network_config["sync_time"]
+        self._collect_garbage_job_time: float = self._network_config["collect_garbage_job_time"]
 
     def get_experiment_name(self):
         return self._experiment_name
@@ -26,3 +27,6 @@ class NetworkInfo:
     
     def get_sync_time(self):
         return self._sync_time
+    
+    def get_collect_garbage_job_time(self):
+        return self._collect_garbage_job_time

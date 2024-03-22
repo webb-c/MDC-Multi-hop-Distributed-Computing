@@ -1,13 +1,25 @@
-from typing import Dict
+from typing import Tuple, Dict
 from job import DNNSubtask, SubtaskInfo
 
 import threading
+import time
 
 class VirtualQueue:
     def __init__(self, address):
         self.address = address
-        self.subtask_infos: Dict[SubtaskInfo, DNNSubtask] = dict()
+        self.subtask_infos: Dict[SubtaskInfo, Tuple[DNNSubtask, int]] = dict()
         self.mutex = threading.Lock()
+
+    def garbage_job_collector(self):
+        cur_time = time.time_ns()
+        self.mutex.acquire()
+        keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= 10 * 1_000_000_000]
+        for k in keys_to_delete:
+            del self.subtask_infos[k]
+
+        print(f"Deleted {len(keys_to_delete)} jobs. {len(self.subtask_infos)} remains.")
+
+        self.mutex.release()
 
     def exist_subtask_info(self, id):
         self.mutex.acquire()
@@ -21,7 +33,8 @@ class VirtualQueue:
             return False
         
         else:
-            self.subtask_infos[subtask_info] = subtask
+            cur_time = time.time_ns()
+            self.subtask_infos[subtask_info] = (subtask, cur_time)
             return True
 
     def del_subtask_info(self, subtask_info):
@@ -32,7 +45,7 @@ class VirtualQueue:
     def find_subtask_info(self, subtask_info):
         if self.exist_subtask_info(subtask_info):
             self.mutex.acquire()
-            result = self.subtask_infos[subtask_info]
+            result, _ = self.subtask_infos[subtask_info]
             self.mutex.release()
             return result
         else:
@@ -47,7 +60,7 @@ class VirtualQueue:
     def get_backlogs(self):
         links = {}
         self.mutex.acquire()
-        for subtask_info, subtask in self.subtask_infos.items():
+        for subtask_info, (subtask, _) in self.subtask_infos.items():
             subtask: DNNSubtask
 
             link = subtask_info.get_link()

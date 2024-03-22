@@ -89,8 +89,6 @@ class Sender(MDC):
 
     def send_frame(self):
         if self.set_job_info_time():
-            print(self._frame[0,0])
-
             job_info_bytes = pickle.dumps(self._job_info)
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
         
