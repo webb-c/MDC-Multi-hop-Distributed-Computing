@@ -18,6 +18,7 @@ class JobManager:
         self._virtual_queue = VirtualQueue(address)
 
         self.init_models()
+        self.init_garbage_job_collector()
 
     def init_models(self):
         jobs = self._network_info.get_jobs()
