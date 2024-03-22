@@ -20,6 +20,7 @@ class VirtualQueue:
 
     def garbage_job_collector(self, collect_garbage_job_time: int):
         cur_time = time_ns()
+        print(cur_time)
         self.mutex.acquire()
         keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= collect_garbage_job_time * 1_000_000_000]
         for k in keys_to_delete:
@@ -53,17 +54,17 @@ class VirtualQueue:
     def find_subtask_info(self, subtask_info):
         if self.exist_subtask_info(subtask_info):
             self.mutex.acquire()
-            result, _ = self.subtask_infos[subtask_info]
+            subtask, _ = self.subtask_infos[subtask_info]
             self.mutex.release()
-            return result
+            return subtask
         else:
             raise Exception("No flow subtask_infos : ", subtask_info)
         
     def pop_subtask_info(self, subtask_info):
-        subtask_info = self.find_subtask_info(subtask_info)
+        subtask = self.find_subtask_info(subtask_info)
         self.del_subtask_info(subtask_info)
 
-        return subtask_info
+        return subtask
     
     def get_backlogs(self):
         links = {}
