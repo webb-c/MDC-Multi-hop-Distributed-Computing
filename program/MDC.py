@@ -17,7 +17,7 @@ class MDC(Program):
     def __init__(self, sub_config, pub_configs):
         self.sub_config = sub_config
         self.pub_configs = pub_configs
-        self._address = get_ip_address("eth0")
+        self._address = get_ip_address(["eth0", "wlan0"])
         self._node_info = NodeInfo(self._address)
         self._controller_publisher = MQTTclient.Publisher(config={
             "ip" : "192.168.1.2",

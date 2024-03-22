@@ -5,12 +5,17 @@ import csv
 import torch
 from torchvision.models import resnet18, ResNet18_Weights
 
-def get_ip_address(interface_name='eth0'):
+def get_ip_address(interface_name=["eth0"]):
     # check os
-    if os.name == 'nt':  # windows
-        return get_ip_address_windows(interface_name)
-    else:  # linux / unix
-        return get_ip_address_linux(interface_name)
+    for interface in interface_name:
+
+        if os.name == "nt":  # windows
+            ip = get_ip_address_windows(interface_name)
+        else:  # linux / unix
+            ip = get_ip_address_linux(interface_name)
+
+        if "192.168.1" in ip:
+            return ip
 
 def get_ip_address_windows(interface_name='eth0'):
     hostname = socket.gethostname()

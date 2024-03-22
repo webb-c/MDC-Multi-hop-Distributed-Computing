@@ -20,7 +20,7 @@ TARGET_DEPTH = 3
 
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
-        self._address = get_ip_address("eth0")
+        self._address = get_ip_address(["eth0", "wlan0"])
         self._frame = None
         self._shape = (TARGET_HEIGHT, TARGET_WIDTH, TARGET_DEPTH)
         self._shared_memory_name = "jetson"
