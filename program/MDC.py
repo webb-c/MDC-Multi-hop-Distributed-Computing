@@ -113,8 +113,11 @@ class MDC(Program):
             # if this is intermidiate node
             dnn_output = self._job_manager.run(previous_dnn_output)
             subtask_info = dnn_output.get_subtask_info()
-
             destination_ip = subtask_info.get_destination().get_ip()
+
+            print(dnn_output.get_subtask_info())
+            dnn_output.get_subtask_info().set_next_subtask_id()
+            print(dnn_output.get_subtask_info())
 
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
