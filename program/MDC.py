@@ -98,8 +98,8 @@ class MDC(Program):
     def handle_dnn(self, topic, data, publisher):
         previous_dnn_output: DNNOutput = pickle.loads(data)
 
-        print("job_id", previous_dnn_output.get_subtask_info().get_job_id())
-        print("output shape", previous_dnn_output.get_output().shape)
+        print("handle_dnn - subtask id", previous_dnn_output.get_subtask_info().get_subtask_id())
+        print("handle_dnn - output shape", previous_dnn_output.get_output().shape)
 
         # terminal node
         if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
@@ -115,9 +115,9 @@ class MDC(Program):
             subtask_info = dnn_output.get_subtask_info()
             destination_ip = subtask_info.get_destination().get_ip()
 
-            print(dnn_output.get_subtask_info())
+            print("handle_dnn -  before", dnn_output.get_subtask_info())
             dnn_output.get_subtask_info().set_next_subtask_id()
-            print(dnn_output.get_subtask_info())
+            print("handle_dnn -  after", dnn_output.get_subtask_info())
 
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
