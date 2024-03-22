@@ -63,7 +63,7 @@ def split_model(model, split_point) -> torch.nn.Module:
         for child in module.children():
             if len(list(child.children())) == 0 : 
                 if start_index <= current_idx < end_index:
-                    layers
+                    layers.append(child)
                 current_idx += 1
             else: 
                 _recursive_add_layers(child)            
