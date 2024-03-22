@@ -45,6 +45,12 @@ class SubtaskInfo(JobInfo):
     
     def __hash__(self):
         return hash(self.get_subtask_id())
+    
+    def __str__(self):
+        return self.get_subtask_id()
+    
+    def __repr__(self):
+        return self.get_subtask_id()
 
     def __eq__(self, other):
         return self.get_subtask_id() == other.get_subtask_id()
