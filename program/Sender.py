@@ -50,6 +50,8 @@ class Sender(MDC):
             self._frame = c.copy()
             time.sleep(1 / 30)
 
+            print(self._frame[0,0])
+
         self._map_file.close()
         self._memory.unlink()
 
