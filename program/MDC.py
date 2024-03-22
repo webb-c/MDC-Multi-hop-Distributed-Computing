@@ -83,7 +83,6 @@ class MDC(Program):
 
     def check_network_info_exists(self, data = None):
         if self._network_info == None:
-            print("The node is not initialized.")
             return False
         
         elif self._network_info != None:
@@ -91,7 +90,6 @@ class MDC(Program):
         
     def check_job_manager_exists(self, data = None):
         if self._job_manager == None:
-            print("The job_manager is not initialized.")
             return False
         
         elif self._job_manager != None:
@@ -99,7 +97,7 @@ class MDC(Program):
 
     def handle_dnn(self, topic, data, publisher):
         previous_dnn_output: DNNOutput = pickle.loads(data)
-        
+
         # terminal node
         if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
             subtask_info = previous_dnn_output.get_subtask_info()
