@@ -40,8 +40,9 @@ class Sender(MDC):
         terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
         job_type = self._network_info.get_jobs()[self._job_name]["job_type"]
         job_name = self._job_name
+        start_time = time.time_ns()
 
-        job_info = JobInfo(source_ip, terminal_destination, job_type, job_name)
+        job_info = JobInfo(source_ip, terminal_destination, job_type, job_name, start_time)
 
         self._job_info = job_info
 

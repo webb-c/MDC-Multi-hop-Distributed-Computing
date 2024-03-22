@@ -1,12 +1,12 @@
 import time
 
 class JobInfo:
-    def __init__(self, source_ip: str, terminal_destination: str, job_type: str, job_name: str):
+    def __init__(self, source_ip: str, terminal_destination: str, job_type: str, job_name: str, start_time: int):
         self._source_ip = source_ip
         self._terminal_destination = terminal_destination
         self._job_type = job_type
         self._job_name = job_name
-        self._start_time = time.time_ns()
+        self._start_time = start_time
 
         self._delimeter = "_"
 
@@ -27,6 +27,9 @@ class JobInfo:
     
     def set_start_time(self, start_time: float):
         self._start_time = start_time
+
+    def get_start_time(self):
+        return self._start_time
 
     def __str__(self):
         return self.get_job_id()

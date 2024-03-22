@@ -11,7 +11,7 @@ class SubtaskInfo(JobInfo):
         self._computing = computing
         self._transfer = transfer
 
-        super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name())
+        super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name(), job_info.get_start_time())
 
     def get_sequence(self):
         return self._sequence
