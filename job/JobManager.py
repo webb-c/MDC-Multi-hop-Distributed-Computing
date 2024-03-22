@@ -88,6 +88,7 @@ class JobManager:
             subtask = DNNSubtask(subtask_info, None)
 
         elif subtask_info.is_computing():
+            print(f"subtask_info.get_model_index() {subtask_info.get_model_index()}")
             subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_model_index()]
             subtask = DNNSubtask(subtask_info, subtask_model)
 
