@@ -50,30 +50,21 @@ class Sender(MDC):
             self._frame = c.copy()
             time.sleep(1 / 30)
 
-            print(self._frame[0,0])
-
         self._map_file.close()
         self._memory.unlink()
 
-    def run(self):
-        streamer_thread = Thread(target=self.stream_player, args=())
+    def start(self):
+        self.wait_until_can_send()
 
-        streamer_thread.start()
+        input("Press any key to start sending.")
+
+        self.run_camera_streamer()
 
         while True:
-            if not (self.check_job_manager_exists() and self.check_network_info_exists()):
-                time.sleep(1.0)
-                continue
-            # with any frame drop logic
-            time.sleep(0.1)
-            if not self.set_job_info_time():
-                continue
+            sleep_time = self.get_sleep_time()
+            time.sleep(sleep_time)
 
-            print(self._frame.shape)
-
-            job_info_bytes = pickle.dumps(self._job_info)
-
-            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
+            self.send_frame()
 
     def set_job_info_time(self):
         if self._network_info == None:
@@ -86,8 +77,27 @@ class Sender(MDC):
             else:
                 self._job_info.set_start_time(time.time_ns())
                 return True
+            
+    def wait_until_can_send(self):
+        while not (self.check_job_manager_exists() and self.check_network_info_exists()):
+            print("Waiting for network info.")
+            time.sleep(1.0)
+            
+    def run_camera_streamer(self):
+        streamer_thread = Thread(target=self.stream_player, args=())
+        streamer_thread.start()
 
+    def send_frame(self):
+        if self.set_job_info_time():
+            print(self._frame[0,0])
+
+            job_info_bytes = pickle.dumps(self._job_info)
+            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
         
+    def get_sleep_time(self) -> float:
+        # implement any frame drop logic
+        return 0.1
+
 if __name__ == '__main__':
     sub_config = {
             "ip": "127.0.0.1", 
@@ -105,4 +115,4 @@ if __name__ == '__main__':
     job_name = "test job 1"
 
     sender = Sender(sub_config, pub_configs, job_name)
-    sender.run()
+    sender.start()
