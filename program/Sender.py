@@ -54,6 +54,7 @@ class Sender(MDC):
 
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
             job_id = subtask_info.get_job_id()
+            print(f"got {job_id}")
             input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]), subtask_info)
             self._job_manager.run(input_frame)
 
@@ -109,6 +110,7 @@ class Sender(MDC):
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
 
             self._frame_list[self._job_info.get_job_id()] = self._frame
+            print(f"register {self._job_info.get_job_id()}")
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
