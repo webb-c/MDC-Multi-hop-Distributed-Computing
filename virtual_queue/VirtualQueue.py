@@ -15,12 +15,13 @@ class VirtualQueue:
         self.mutex.release()
         return result
 
-    def add_subtask_info(self, subtask_info, subtask: DNNSubtask):
+    def add_subtask_info(self, subtask_info: SubtaskInfo, subtask: DNNSubtask):
         # ex) "192.168.1.5", Job
         if self.exist_subtask_info(subtask_info):
             return False
         
         else:
+            print(subtask_info.get_subtask_id())
             self.subtask_infos[subtask_info] = subtask
             return True
 
