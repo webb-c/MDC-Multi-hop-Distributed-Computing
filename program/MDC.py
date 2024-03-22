@@ -99,9 +99,7 @@ class MDC(Program):
 
     def handle_dnn(self, topic, data, publisher):
         previous_dnn_output: DNNOutput = pickle.loads(data)
-
-        assert previous_dnn_output.is_destination(self._address), "Job / Response's destination should be matched."
-
+        
         # terminal node
         if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
             subtask_info = previous_dnn_output.get_subtask_info()

@@ -2,6 +2,7 @@ import torch
 
 from communication import *
 from job import SubtaskInfo
+from layeredgraph import LayerNode
 
 class DNNOutput:
     def __init__(self, data: torch.Tensor, subtask_info: SubtaskInfo) -> None:
@@ -20,8 +21,8 @@ class DNNOutput:
     def get_output(self):
         return self._output
     
-    def is_destination(self, other_address):
-        if self._subtask_info.get_destination() == other_address:
+    def is_destination(self, other_layer_node: LayerNode):
+        if self._subtask_info.get_destination() == other_layer_node:
             return True
         else:
             return False
