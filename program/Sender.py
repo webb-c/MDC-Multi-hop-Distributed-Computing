@@ -8,10 +8,11 @@ from threading import Thread
 import numpy as np
 import posix_ipc
 import mmap
+import torch
 
 from utils.utils import get_ip_address
 from program import MDC
-from job import JobInfo
+from job import JobInfo, SubtaskInfo, DNNOutput
 
 TARGET_WIDTH = 224
 TARGET_HEIGHT = 224
@@ -30,6 +31,7 @@ class Sender(MDC):
 
         self._job_name = job_name
         self._job_info = None
+        self._frame_list = dict()
 
         super().__init__(sub_config, pub_configs)
 
@@ -43,6 +45,20 @@ class Sender(MDC):
 
         self._job_info = job_info
 
+    def handle_subtask_info(self, topic, data, publisher): # overriding
+        subtask_info: SubtaskInfo = pickle.loads(data)
+
+        self._job_manager.add_subtask(subtask_info)
+
+        subtask_layer_node = subtask_info.get_source()
+
+        if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
+            job_id = subtask_info.get_job_id()
+            input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]), subtask_info)
+            self._job_manager.run(input_frame)
+
+            print(f"run {job_id} : {subtask_info.get_subtask_id()}")
+            
     def stream_player(self):
         c = np.ndarray(self._shape, dtype=np.uint8, buffer=self._map_file)
 
@@ -91,6 +107,8 @@ class Sender(MDC):
         if self.set_job_info_time():
             job_info_bytes = pickle.dumps(self._job_info)
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
+
+            self._frame_list[self._job_info.get_job_id()] = self._frame
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
