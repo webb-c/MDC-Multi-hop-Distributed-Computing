@@ -70,7 +70,7 @@ class JobManager:
             subtask = DNNSubtask(subtask_info, None)
 
         elif subtask_info.is_computing():
-            subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_sequence()]
+            subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_model_index()]
             subtask = DNNSubtask(subtask_info, subtask_model)
 
         success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_info, subtask)

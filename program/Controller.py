@@ -98,14 +98,13 @@ class Controller(Program):
 
         print(path)
 
-        # send job info to all nodes in schedule.
-        # TODO
         model_index = 0
         for i in range(len(path) - 1):
             source_node: LayerNode = path[i]
             destination_node: LayerNode = path[i + 1]
-            computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][i]
-            transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][i]
+
+            computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][model_index]
+            transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][model_index]
 
             subtask_info = SubtaskInfo(job_info, i, model_index, source_node, destination_node, computing, transfer)
             subtask_info_bytes = pickle.dumps(subtask_info)
