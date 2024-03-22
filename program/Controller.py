@@ -98,7 +98,11 @@ class Controller(Program):
 
         print(path)
 
-        model_index = 0
+        if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
+            model_index = 1
+        else:
+            model_index = 0
+        
         for i in range(len(path) - 1):
             source_node: LayerNode = path[i]
             destination_node: LayerNode = path[i + 1]
