@@ -10,9 +10,9 @@ def get_ip_address(interface_name=["eth0"]):
     for interface in interface_name:
 
         if os.name == "nt":  # windows
-            ip = get_ip_address_windows(interface_name)
+            ip = get_ip_address_windows(interface)
         else:  # linux / unix
-            ip = get_ip_address_linux(interface_name)
+            ip = get_ip_address_linux(interface)
 
         if "192.168.1" in ip:
             return ip
