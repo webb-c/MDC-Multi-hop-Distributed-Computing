@@ -79,7 +79,6 @@ def split_model(model: torch.nn.Module, split_point, flatten_index: int) -> torc
     if flatten_index != None:
         layers.insert(flatten_index, torch.nn.Flatten())
     splited_model = torch.nn.Sequential(*layers[start:end])
-    print(len(list(model.children())))
     return splited_model
 
 def load_model(model_name) -> torch.nn.Module:
