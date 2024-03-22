@@ -41,7 +41,8 @@ class JobManager:
                         x = torch.zeros(job["warmup_input"])
                         for subtask in self._models[job_name]:
                             x : torch.Tensor = subtask(x)
-
+                print(f"Succesfully load {job_name}")
+                
             elif job["job_type"] == "packet":
                 pass
 

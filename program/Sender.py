@@ -69,12 +69,12 @@ class Sender(MDC):
 
             subtask_info = dnn_output.get_subtask_info()
 
-            destination = subtask_info.get_destination()
+            destination_ip = subtask_info.get_destination().get_ip()
 
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
             # send job to next node
-            publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination)
+            publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
        
             
     def stream_player(self):
