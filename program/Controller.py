@@ -10,6 +10,7 @@ from utils import save_latency
 
 import pickle, json
 import paho.mqtt.publish as publish
+import threading
 
 class Controller(Program):
     def __init__(self, sub_config, pub_configs):
@@ -32,10 +33,12 @@ class Controller(Program):
         self._layered_graph = None
         
         self._job_list = {}
+        self._job_list_mutex = threading.Lock()
 
         self.init_network_info()
         self.init_path()
         self.init_layered_graph()
+        self.init_garbage_job_collector()
 
     def init_network_info(self):
         with open("config.json", 'r') as file:
@@ -48,6 +51,25 @@ class Controller(Program):
         
     def init_layered_graph(self):
         self._layered_graph = LayeredGraph(self._network_info)
+
+    def init_garbage_job_collector(self):
+        callback_thread = threading.Thread(target=self.garbage_job_collector, args=())
+        callback_thread.start()
+
+    def garbage_job_collector(self):
+        while True:
+            time.sleep(10)
+
+            cur_time = time.time_ns()
+
+            self._job_list_mutex.acquire()
+            keys_to_delete = [k for k, v in self._job_list.items() if cur_time - v >= 10 * 1_000_000_000]
+            for k in keys_to_delete:
+                del self._job_list[k]
+
+            self._job_list_mutex.release()
+
+            print(f"Deleted {len(keys_to_delete)} jobs.")
 
     def handle_network_info(self, topic, payload, publisher):
         # get source ip address
