@@ -80,7 +80,7 @@ class JobManager:
             # run job
             dnn_output = subtask.run(data)
 
-            print(data.shape)
+            print("run", data.shape)
 
             return dnn_output
 
