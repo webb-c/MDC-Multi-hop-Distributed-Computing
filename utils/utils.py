@@ -71,7 +71,6 @@ def split_model(model, split_point) -> torch.nn.Module:
 
     _recursive_add_layers(model)
     splited_model = torch.nn.Sequential(*layers)
-    print(current_idx)
     return splited_model
 
 def load_model(model_name) -> torch.nn.Module:
