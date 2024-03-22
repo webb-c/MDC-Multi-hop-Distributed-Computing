@@ -105,11 +105,12 @@ class Sender(MDC):
         streamer_thread.start()
 
     def send_frame(self):
+        time.sleep(0.0000000001)
         if self.set_job_info_time():
             job_info_bytes = pickle.dumps(self._job_info)
-            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
-
             self._frame_list[self._job_info.get_job_id()] = self._frame
+
+            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
             print(f"register {self._job_info.get_job_id()}")
         
     def get_sleep_time(self) -> float:
