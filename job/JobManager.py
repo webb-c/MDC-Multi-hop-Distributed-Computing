@@ -34,7 +34,6 @@ class JobManager:
                 for split_point in job["split_points"]:
                     subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
                     self._models[job_name].append(subtask)
-                    print(subtask)
 
                 # load models first time
                 if job["warmup"]:
@@ -42,8 +41,6 @@ class JobManager:
                         x = torch.zeros(job["warmup_input"])
                         for subtask in self._models[job_name]:
                             x : torch.Tensor = subtask(x)
-
-                            print(x.shape)
 
             elif job["job_type"] == "packet":
                 pass
