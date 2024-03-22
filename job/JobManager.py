@@ -78,6 +78,8 @@ class JobManager:
             # run job
             dnn_output = subtask.run(data)
 
+            print(data.shape)
+
             return dnn_output
 
     # add subtask_info based SubtaskInfo

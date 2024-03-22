@@ -134,8 +134,6 @@ class Controller(Program):
             subtask_info = SubtaskInfo(job_info, i, model_index, source_node, destination_node, computing, transfer)
             subtask_info_bytes = pickle.dumps(subtask_info)
 
-            print(f"made {subtask_info.get_subtask_id()}")
-
             if i != 0 and source_node.is_same_node(destination_node) and not source_node.is_same_layer(destination_node):
                 model_index += 1
 
