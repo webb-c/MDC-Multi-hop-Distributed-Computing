@@ -27,7 +27,7 @@ class JobManager:
             if job["job_type"] == "dnn":
                 # load whole dnn model
                 model_name = job["model_name"]
-                model, flatten_index = load_model(model_name).eval()
+                model, flatten_index = load_model(model_name)
 
                 # init model list and split model
                 self._models[job_name] = []
@@ -38,11 +38,12 @@ class JobManager:
 
                 # load models first time
                 if job["warmup"]:
-                    x = torch.zeros(job["warmup_input"])
-                    for subtask in self._models[job_name]:
-                        x : torch.Tensor = subtask(x)
+                    with torch.no_grad():
+                        x = torch.zeros(job["warmup_input"])
+                        for subtask in self._models[job_name]:
+                            x : torch.Tensor = subtask(x)
 
-                        print(x.shape)
+                            print(x.shape)
 
             elif job["job_type"] == "packet":
                 pass
