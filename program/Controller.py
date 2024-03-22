@@ -67,9 +67,9 @@ class Controller(Program):
             for k in keys_to_delete:
                 del self._job_list[k]
 
-            self._job_list_mutex.release()
+            print(f"Deleted {len(keys_to_delete)} jobs. {len(self._job_list)} remains.")
 
-            print(f"Deleted {len(keys_to_delete)} jobs.")
+            self._job_list_mutex.release()
 
     def handle_network_info(self, topic, payload, publisher):
         # get source ip address
