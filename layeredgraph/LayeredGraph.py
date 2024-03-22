@@ -66,7 +66,8 @@ class LayeredGraph:
         self._layered_graph_backlog[link] = backlog
 
     def init_graph(self):
-        self._max_layer_depth = max([len(job["split_points"]) for job_name, job in self._network_info.get_jobs().items()])
+        # split point + 1
+        self._max_layer_depth = max([len(job["split_points"]) for job_name, job in self._network_info.get_jobs().items()]) + 1
 
         for layer in range(self._max_layer_depth):
             for source_ip in self._network:
