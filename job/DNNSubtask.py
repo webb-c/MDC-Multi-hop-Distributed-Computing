@@ -23,7 +23,8 @@ class DNNSubtask:
             dnn_output = DNNOutput(data, self._subtask_info)
         # computing dnn
         elif self._subtask_info.is_computing():
-            output: torch.Tensor = self._dnn_model(data)
+            with torch.no_grad():
+                output: torch.Tensor = self._dnn_model(data)
             dnn_output = DNNOutput(output, self._subtask_info)
         
         return dnn_output
