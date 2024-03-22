@@ -55,6 +55,7 @@ class Sender(MDC):
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
             job_id = subtask_info.get_job_id()
             print(f"got {job_id}")
+            print(f"got {subtask_info.get_subtask_id()}")
             input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]), subtask_info)
             self._job_manager.run(input_frame)
 
@@ -105,7 +106,6 @@ class Sender(MDC):
         streamer_thread.start()
 
     def send_frame(self):
-        time.sleep(0.0000000001)
         if self.set_job_info_time():
             job_info_bytes = pickle.dumps(self._job_info)
             self._frame_list[self._job_info.get_job_id()] = self._frame
