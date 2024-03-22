@@ -3,11 +3,12 @@ from layeredgraph import LayerNode, LayerNodePair
 
 # info class for making subtask
 class SubtaskInfo(JobInfo):
-    def __init__(self, job_info: JobInfo, sequence: int, model_index: int, source: LayerNode, destination: LayerNode, computing: float, transfer: float):
+    def __init__(self, job_info: JobInfo, sequence: int, model_index: int, source_layer_node: LayerNode, destination_layer_node: LayerNode, future_destination_layer_node: LayerNode, computing: float, transfer: float):
         self._sequence = sequence # includes data transfer, dnn computation
         self._model_index = model_index # only includes dnn computation
-        self._source = source
-        self._destination = destination
+        self._source_layer_node = source_layer_node
+        self._destination_layer_node = destination_layer_node
+        self._future_destination_layer_node = future_destination_layer_node
         self._computing = computing
         self._transfer = transfer
 
@@ -20,10 +21,10 @@ class SubtaskInfo(JobInfo):
         return self._model_index
     
     def get_source(self):
-        return self._source
+        return self._source_layer_node
     
     def get_destination(self):
-        return self._destination  
+        return self._destination_layer_node  
     
     def get_computing(self):
         return self._computing
@@ -32,16 +33,20 @@ class SubtaskInfo(JobInfo):
         return self._transfer
         
     def get_subtask_id(self):
-        return self._delimeter.join([self.get_job_id(), self._source.to_string(), self._destination.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
+        return self._delimeter.join([self.get_job_id(), self._source_layer_node.to_string(), self._destination_layer_node.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
     
+    def set_next_subtask_id(self):
+        self._source_layer_node = self._destination_layer_node
+        self._destination_layer_node = self._future_destination_layer_node
+        
     def get_link(self):
-        return LayerNodePair(self._source, self._destination)
+        return LayerNodePair(self._source_layer_node, self._destination_layer_node)
     
     def is_transmission(self):
-        return self._source.is_same_layer(self._destination)
+        return self._source_layer_node.is_same_layer(self._destination_layer_node)
     
     def is_computing(self):
-        return self._source.is_same_node(self._destination)
+        return self._source_layer_node.is_same_node(self._destination_layer_node)
     
     def __hash__(self):
         return hash(self.get_subtask_id())
