@@ -127,7 +127,7 @@ class Controller(Program):
         for i in range(len(path) - 1):
             source_layer_node: LayerNode = path[i]
             destination_layer_node: LayerNode = path[i + 1]
-            future_destination_layer_node: LayerNode = path[i + 2] if i + 1 < len(path) else None
+            future_destination_layer_node: LayerNode = path[i + 2] if i + 2 < len(path) else None
 
             computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][model_index]
             transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][model_index]
