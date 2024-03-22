@@ -84,7 +84,7 @@ class JobManager:
             dnn_output.get_subtask_info().set_next_subtask_id()
             print(dnn_output.get_subtask_info())
 
-            print("run", data.shape)
+            print("run", dnn_output.get_output().shape)
 
             return dnn_output
 
