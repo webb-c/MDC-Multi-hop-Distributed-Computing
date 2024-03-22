@@ -111,7 +111,7 @@ class LayeredGraph:
     def schedule(self, source_ip: str, job_info: JobInfo):
         split_num = len(self._network_info.get_jobs()[job_info.get_job_name()]["split_points"])
         source_node = LayerNode(source_ip, 0)
-        destination_node = LayerNode(job_info.get_terminal_destination(), split_num - 1)
+        destination_node = LayerNode(job_info.get_terminal_destination(), split_num)
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
 
         return path
