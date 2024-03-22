@@ -3,8 +3,7 @@ from layeredgraph import LayerNode, LayerNodePair
 
 # info class for making subtask
 class SubtaskInfo(JobInfo):
-    def __init__(self, job_info: JobInfo, sequence: int, model_index: int, source_layer_node: LayerNode, destination_layer_node: LayerNode, future_destination_layer_node: LayerNode, computing: float, transfer: float):
-        self._sequence = sequence # includes data transfer, dnn computation
+    def __init__(self, job_info: JobInfo, model_index: int, source_layer_node: LayerNode, destination_layer_node: LayerNode, future_destination_layer_node: LayerNode, computing: float, transfer: float):
         self._model_index = model_index # only includes dnn computation
         self._source_layer_node = source_layer_node
         self._destination_layer_node = destination_layer_node
@@ -13,9 +12,6 @@ class SubtaskInfo(JobInfo):
         self._transfer = transfer
 
         super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name(), job_info.get_start_time())
-
-    def get_sequence(self):
-        return self._sequence
     
     def get_model_index(self):
         return self._model_index
@@ -33,7 +29,7 @@ class SubtaskInfo(JobInfo):
         return self._transfer
         
     def get_subtask_id(self):
-        return self._delimeter.join([self.get_job_id(), self._source_layer_node.to_string(), self._destination_layer_node.to_string(), str(self._sequence)]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
+        return self._delimeter.join([self.get_job_id(), self._source_layer_node.to_string(), self._destination_layer_node.to_string()]) # yolo20240312101010_192.168.1.5-0_192.168.1.6-0_1
     
     def set_next_subtask_id(self):
         self._source_layer_node = self._destination_layer_node
