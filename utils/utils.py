@@ -53,24 +53,30 @@ def save_latency(file_name, latency):
         writer.writerow([latency])
 
 
-def split_model(model, split_point) -> torch.nn.Module:
-    current_idx = 0
-    layers = []
-    start_index, end_index = split_point
+# def split_model(model, split_point) -> torch.nn.Module:
+#     current_idx = 0
+#     layers = []
+#     start_index, end_index = split_point
 
-    def _recursive_add_layers(module):
-        nonlocal current_idx
-        for child in module.children():
-            if len(list(child.children())) == 0 : 
-                if start_index <= current_idx < end_index:
-                    layers.append(child)
-                current_idx += 1
-            else: 
-                _recursive_add_layers(child)            
-        return
+#     def _recursive_add_layers(module):
+#         nonlocal current_idx
+#         for child in module.children():
+#             if len(list(child.children())) == 0 : 
+#                 if start_index <= current_idx < end_index:
+#                     layers.append(child)
+#                 current_idx += 1
+#             else: 
+#                 _recursive_add_layers(child)            
+#         return
 
-    _recursive_add_layers(model)
-    splited_model = torch.nn.Sequential(*layers)
+#     _recursive_add_layers(model)
+#     splited_model = torch.nn.Sequential(*layers)
+#     return splited_model
+        
+def split_model(model: torch.nn.Module, split_point) -> torch.nn.Module:
+    start, end = split_point
+    splited_model = torch.nn.Sequential(*list(model.children())[start:end])
+    print(len(list(model.children())))
     return splited_model
 
 def load_model(model_name) -> torch.nn.Module:
@@ -91,6 +97,6 @@ def load_model(model_name) -> torch.nn.Module:
         return None # TODO
     
     elif model_name == "mobilenet_v2":
-        model = mobilenet_v2(pretrained=True)
+        model = mobilenet_v2(pretrained=True, )
         model.eval()
         return model # TODO
