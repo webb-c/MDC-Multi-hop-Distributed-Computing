@@ -3,7 +3,7 @@ import subprocess, socket, re, os
 import csv
 
 import torch
-from torchvision.models import resnet18
+from torchvision.models import resnet18, mobilenet_v2
 
 def get_ip_address(interface_name=["eth0"]):
     # check os
@@ -71,7 +71,7 @@ def split_model(model, split_point) -> torch.nn.Module:
 
     _recursive_add_layers(model)
     splited_model = torch.nn.Sequential(*layers)
-
+    print(current_idx)
     return splited_model
 
 def load_model(model_name) -> torch.nn.Module:
@@ -90,3 +90,8 @@ def load_model(model_name) -> torch.nn.Module:
     
     elif model_name == "resnet-50":
         return None # TODO
+    
+    elif model_name == "mobilenet_v2":
+        model = mobilenet_v2(pretrained=True)
+        model.eval()
+        return model # TODO
