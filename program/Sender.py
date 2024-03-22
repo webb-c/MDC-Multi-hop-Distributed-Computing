@@ -9,6 +9,14 @@ import numpy as np
 import posix_ipc
 import mmap
 import torch
+try:
+    from time import time_ns
+except ImportError:
+    from datetime import datetime
+    # For compatibility with Python 3.6
+    def time_ns():
+        now = datetime.now()
+        return int(now.timestamp() * 1e9)
 
 from utils.utils import get_ip_address
 from program import MDC
@@ -40,7 +48,7 @@ class Sender(MDC):
         terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
         job_type = self._network_info.get_jobs()[self._job_name]["job_type"]
         job_name = self._job_name
-        start_time = time.time_ns()
+        start_time = time_ns()
 
         job_info = JobInfo(source_ip, terminal_destination, job_type, job_name, start_time)
 
@@ -92,7 +100,7 @@ class Sender(MDC):
                 self.init_job_info()
                 return True
             else:
-                self._job_info.set_start_time(time.time_ns())
+                self._job_info.set_start_time(time_ns())
                 return True
             
     def wait_until_can_send(self):

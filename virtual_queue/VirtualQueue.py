@@ -3,6 +3,14 @@ from job import DNNSubtask, SubtaskInfo
 
 import threading
 import time
+try:
+    from time import time_ns
+except ImportError:
+    from datetime import datetime
+    # For compatibility with Python 3.6
+    def time_ns():
+        now = datetime.now()
+        return int(now.timestamp() * 1e9)
 
 class VirtualQueue:
     def __init__(self, address):
@@ -11,7 +19,7 @@ class VirtualQueue:
         self.mutex = threading.Lock()
 
     def garbage_job_collector(self, collect_garbage_job_time: int):
-        cur_time = time.time_ns()
+        cur_time = time_ns()
         self.mutex.acquire()
         keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= collect_garbage_job_time * 1_000_000_000]
         for k in keys_to_delete:
@@ -33,7 +41,7 @@ class VirtualQueue:
             return False
         
         else:
-            cur_time = time.time_ns()
+            cur_time = time_ns()
             self.subtask_infos[subtask_info] = (subtask, cur_time)
             return True
 
