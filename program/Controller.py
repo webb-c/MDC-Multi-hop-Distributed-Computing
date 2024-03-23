@@ -141,7 +141,10 @@ class Controller(Program):
             
     def handle_response(self, topic, payload, publisher):
         subtask_info: SubtaskInfo = pickle.loads(payload)
+        self._job_list_mutex.acquire()
         start_time = self._job_list[subtask_info.get_job_id()]
+        del self._job_list[subtask_info.get_job_id()]
+        self._job_list_mutex.release()
         finish_time = time.time_ns()
 
         latency = finish_time - start_time
