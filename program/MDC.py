@@ -107,7 +107,7 @@ class MDC(Program):
             self._controller_publisher.publish("job/response", subtask_info_bytes)
 
         else: 
-            if self._job_manager.is_subtask_exists(previous_dnn_output.get_subtask_info()):
+            if self._job_manager.is_subtask_exists(previous_dnn_output):
                 # if this is intermidiate node
                 dnn_output = self._job_manager.run(previous_dnn_output)
                 subtask_info = dnn_output.get_subtask_info()
