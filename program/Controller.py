@@ -142,9 +142,11 @@ class Controller(Program):
             publish.single("job/subtask_info", subtask_info_bytes, hostname=source_layer_node.get_ip())
             
     def handle_response(self, topic, payload, publisher):
-        subtask_info: SubtaskInfo = pickle.dumps(payload)
+        subtask_info: SubtaskInfo = pickle.loads(payload)
         start_time = self._job_list[subtask_info.get_job_id()]
         finish_time = time.time_ns()
+
+        print(f"got got {subtask_info.get_job_id()}")
 
         latency = finish_time - start_time
         file_path = f"{self._log_path}/{subtask_info.get_job_name()}"
@@ -163,7 +165,7 @@ if __name__ == '__main__':
             "port": 1883,
             "topics": [
                 ("mdc/network_info", 1),
-                ("mdc/response", 1),
+                ("job/response", 1),
                 ("mdc/node_info", 1),
                 ("job/request_scheduling", 1),
             ],
