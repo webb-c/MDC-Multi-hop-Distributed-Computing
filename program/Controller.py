@@ -127,7 +127,7 @@ class Controller(Program):
         for i in range(len(path) - 1):
             source_layer_node: LayerNode = path[i]
             destination_layer_node: LayerNode = path[i + 1]
-            future_destination_layer_node: LayerNode = path[i + 2] if i + 2 < len(path) else None
+            future_destination_layer_node: LayerNode = path[i + 2] if i + 2 < len(path) else path[i + 1]
 
             if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
                 model_index += 1
