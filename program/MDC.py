@@ -104,7 +104,7 @@ class MDC(Program):
             subtask_info_bytes = pickle.dumps(subtask_info)
 
             # send subtask info to controller
-            self._controller_publisher.publish("mdc/response", subtask_info_bytes)
+            self._controller_publisher.publish("job/response", subtask_info_bytes)
 
         else: 
             # if this is intermidiate node
