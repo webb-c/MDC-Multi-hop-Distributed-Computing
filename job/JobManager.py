@@ -80,8 +80,6 @@ class JobManager:
             # run job
             dnn_output = subtask.run(data)
 
-            print("run", dnn_output.get_output().shape)
-
             return dnn_output
 
     # add subtask_info based SubtaskInfo
@@ -91,7 +89,6 @@ class JobManager:
 
         elif subtask_info.is_computing():
             subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_model_index()]
-            print(f"{subtask_info.get_subtask_id()} : added {subtask_model}")
             subtask = DNNSubtask(subtask_info, subtask_model)
 
         success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_info, subtask)

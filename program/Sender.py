@@ -63,19 +63,13 @@ class Sender(MDC):
         subtask_layer_node = subtask_info.get_source()
 
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
-            print(f"Start computing {subtask_info.get_subtask_id()}")
             job_id = subtask_info.get_job_id()
             input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]).float().view(1, TARGET_DEPTH, TARGET_HEIGHT, TARGET_WIDTH), subtask_info)
             dnn_output = self._job_manager.run(input_frame)
             destination_ip = subtask_info.get_destination().get_ip()
 
-            print(dnn_output.get_subtask_info())
-            dnn_output.get_subtask_info().set_next_subtask_id()
-            print(dnn_output.get_subtask_info())
 
-            print("destination_ip", destination_ip)
-            print("subtask_info", subtask_info)
-            print()
+            dnn_output.get_subtask_info().set_next_subtask_id()
 
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
