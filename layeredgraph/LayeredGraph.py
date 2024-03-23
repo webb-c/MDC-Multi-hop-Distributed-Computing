@@ -101,8 +101,6 @@ class LayeredGraph:
                 self._layer_node_pairs.append(link)
                 self._layered_graph_backlog[link] = 0
 
-        print(self._layered_graph_backlog)
-
     def init_algorithm(self):
         module_path = self._network_info.get_scheduling_algorithm().replace(".py", "").replace("/", ".")
         self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path).Dijkstra()

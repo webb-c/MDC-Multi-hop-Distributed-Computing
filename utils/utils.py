@@ -41,6 +41,8 @@ def save_latency(file_name, latency):
     # 파일이 존재하는지 확인
     file_exists = os.path.exists(file_path)
 
+    latency = f"{latency / 1_000_000} ms"
+
     # 파일에 데이터 쓰기
     with open(file_path, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)

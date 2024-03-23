@@ -112,8 +112,6 @@ class Controller(Program):
         self._layered_graph.update_graph()
         job_info: JobInfo = pickle.loads(payload)
 
-        print(f"got {job_info.get_job_id()}")
-
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
@@ -145,8 +143,6 @@ class Controller(Program):
         subtask_info: SubtaskInfo = pickle.loads(payload)
         start_time = self._job_list[subtask_info.get_job_id()]
         finish_time = time.time_ns()
-
-        print(f"got got {subtask_info.get_job_id()}")
 
         latency = finish_time - start_time
         file_path = f"{self._log_path}/{subtask_info.get_job_name()}"
