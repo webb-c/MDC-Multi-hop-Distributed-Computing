@@ -50,5 +50,5 @@
 
     "scheduling_algorithm" : "scheduling/Dijkstra.py",
     "sync_time" : 1.0,
-    "collect_garbage_job_time" : 20
+    "collect_garbage_job_time" : 60
 }
