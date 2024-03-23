@@ -92,7 +92,6 @@ class JobManager:
             subtask = DNNSubtask(subtask_info, subtask_model)
 
         success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_info, subtask)
-        print(f"Successfully added job {subtask_info.get_subtask_id()}")
         
         if not success_add_subtask_info:
             raise Exception(f"Subtask already exists. : {subtask_info.get_subtask_id()}")

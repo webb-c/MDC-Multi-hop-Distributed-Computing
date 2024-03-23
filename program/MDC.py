@@ -56,7 +56,7 @@ class MDC(Program):
             # send NetworkInfo byte to source ip (response)
             self._controller_publisher.publish("mdc/network_info", node_info_bytes)
 
-            time.sleep(10)
+            time.sleep(2)
 
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
