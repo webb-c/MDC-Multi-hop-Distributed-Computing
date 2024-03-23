@@ -48,7 +48,7 @@ class JobManager:
 
     def is_subtask_exists(self, output: DNNOutput):
         previous_subtask_info = output.get_subtask_info()
-        if self._virtual_queue.exist_subtask_info(previous_subtask_info.get_subtask_id()):
+        if self._virtual_queue.exist_subtask_info(previous_subtask_info):
             return True
         else:
             return False
