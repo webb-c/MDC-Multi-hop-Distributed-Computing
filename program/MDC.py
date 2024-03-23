@@ -107,17 +107,20 @@ class MDC(Program):
             self._controller_publisher.publish("job/response", subtask_info_bytes)
 
         else: 
-            # if this is intermidiate node
-            dnn_output = self._job_manager.run(previous_dnn_output)
-            subtask_info = dnn_output.get_subtask_info()
-            destination_ip = subtask_info.get_destination().get_ip()
+            if self._job_manager.is_subtask_exists(previous_dnn_output.get_subtask_info()):
+                # if this is intermidiate node
+                dnn_output = self._job_manager.run(previous_dnn_output)
+                subtask_info = dnn_output.get_subtask_info()
+                destination_ip = subtask_info.get_destination().get_ip()
 
-            dnn_output.get_subtask_info().set_next_subtask_id()
+                dnn_output.get_subtask_info().set_next_subtask_id()
 
-            dnn_output_bytes = pickle.dumps(dnn_output)
-                
-            # send job to next node
-            publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
+                dnn_output_bytes = pickle.dumps(dnn_output)
+                    
+                # send job to next node
+                publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
+            else:
+                print(f"{previous_dnn_output.get_subtask_info()} is not exists. It may be deleted.")
        
 if __name__ == '__main__':
     sub_config = {
