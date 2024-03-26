@@ -40,7 +40,7 @@ class CapacityManager:
 
         self._computing_capacities = self._computing_capacities[-self._sample_num:]
 
-        self._computing_capacity_avg = sum(self._computing_capacities) / self._sample_num
+        self._computing_capacity_avg = sum(self._computing_capacities) / len(self._computing_capacities)
 
         print(f"computing_capacity : {self._computing_capacity_avg}")
 
@@ -51,7 +51,7 @@ class CapacityManager:
 
         self._transfer_capacities = self._transfer_capacities[-self._sample_num:]
 
-        self._transfer_capacity_avg = sum(self._transfer_capacities) / self._sample_num
+        self._transfer_capacity_avg = sum(self._transfer_capacities) / len(self._sample_num)
 
         print(f"transfer_capacity : {self._transfer_capacity_avg}")
 
