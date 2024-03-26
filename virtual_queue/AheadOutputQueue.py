@@ -35,6 +35,7 @@ class AheadOutputQueue:
         return result
 
     def add_dnn_output(self, subtask_info: SubtaskInfo, dnn_output: DNNOutput):
+        print(f"ahead dnn output {subtask_info} added.")
         # ex) "192.168.1.5", Job
         if self.exist_dnn_output(subtask_info):
             return False
@@ -59,6 +60,7 @@ class AheadOutputQueue:
             raise Exception("No flow dnn_outputs : ", subtask_info)
         
     def pop_dnn_output(self, subtask_info: SubtaskInfo):
+        print(f"ahead dnn output {subtask_info} poped.")
         dnn_output = self.find_dnn_output(subtask_info)
         self.del_dnn_output(subtask_info)
 
