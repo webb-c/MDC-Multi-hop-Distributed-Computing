@@ -5,6 +5,7 @@ from job.DNNOutput import DNNOutput
 from job.DNNSubtask import DNNSubtask
 
 from job.Job import Job
+from job.DNNModels import DNNModels
 from job.Subtask import Subtask
 
 

@@ -17,34 +17,9 @@ class JobManager:
 
         self._virtual_queue = VirtualQueue(address)
 
-        self.init_models()
+        self._dnn_models = DNNModels(self._network_info)
+        
         self.init_garbage_job_collector()
-
-    def init_models(self):
-        jobs = self._network_info.get_jobs()
-        for job_name in jobs:
-            job = jobs[job_name]
-            if job["job_type"] == "dnn":
-                # load whole dnn model
-                model_name = job["model_name"]
-                model, flatten_index = load_model(model_name)
-
-                # init model list and split model
-                self._models[job_name] = []
-                for split_point in job["split_points"]:
-                    subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
-                    self._models[job_name].append(subtask)
-
-                # load models first time
-                if job["warmup"]:
-                    with torch.no_grad():
-                        x = torch.zeros(job["warmup_input"])
-                        for subtask in self._models[job_name]:
-                            x : torch.Tensor = subtask(x)
-                print(f"Succesfully load {job_name}")
-                
-            elif job["job_type"] == "packet":
-                pass
 
     def is_subtask_exists(self, output: DNNOutput):
         previous_subtask_info = output.get_subtask_info()
@@ -64,7 +39,6 @@ class JobManager:
 
             self._virtual_queue.garbage_job_collector(collect_garbage_job_time)
 
-        
     def get_backlogs(self):
         return self._virtual_queue.get_backlogs()
 
@@ -84,12 +58,18 @@ class JobManager:
 
     # add subtask_info based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
-        if subtask_info.is_transmission():
-            subtask = DNNSubtask(subtask_info, None)
+        job_name = subtask_info.get_job_name()
+        model_index = subtask_info.get_model_index()
+        subtask_model = self._dnn_models.get_subtask(job_name, model_index) if subtask_info.is_computing() else None
+        computing = self._dnn_models.get_computing(job_name, model_index) * subtask_info.get_input_size()
+        transfer = self._dnn_models.get_transfer(job_name, model_index) * subtask_info.get_input_size()
 
-        elif subtask_info.is_computing():
-            subtask_model = self._models[subtask_info.get_job_name()][subtask_info.get_model_index()]
-            subtask = DNNSubtask(subtask_info, subtask_model)
+        subtask = DNNSubtask(
+            subtask_info = subtask_info,
+            dnn_model = subtask_model,
+            computing = computing,
+            transfer = transfer
+        )
 
         success_add_subtask_info = self._virtual_queue.add_subtask_info(subtask_info, subtask)
         
