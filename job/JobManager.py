@@ -4,7 +4,7 @@ import torch
 from job import *
 from utils import *
 from communication import *
-from virtual_queue import VirtualQueue
+from virtual_queue import VirtualQueue, AheadOutputQueue
 
 import threading
 import time
@@ -17,17 +17,13 @@ class JobManager:
         else:
             self._device = "cpu"
 
-        self._models : Dict[str, List] = dict()
-
         self._network_info = network_info
 
-        self._virtual_queue = VirtualQueue(address)
-
+        self._virtual_queue = VirtualQueue()
+        self._ahead_of_time_outputs = AheadOutputQueue()
         self._dnn_models = DNNModels(self._network_info, self._device)
-
-        print(self._device)
         
-        self.init_garbage_job_collector()
+        self.init_garbage_subtask_collector()
 
     def is_subtask_exists(self, output: DNNOutput):
         previous_subtask_info = output.get_subtask_info()
@@ -36,16 +32,37 @@ class JobManager:
         else:
             return False
         
-    def init_garbage_job_collector(self):
-        callback_thread = threading.Thread(target=self.garbage_job_collector, args=())
-        callback_thread.start()
+    def is_dnn_output_exists(self, subtask_info: SubtaskInfo):
+        if self._ahead_of_time_outputs.exist_dnn_output(subtask_info):
+            return True
+        else:
+            return False
+        
+    # add dnn_output if schedule is not arrived yet
+    def pop_dnn_output(self, subtask_info: SubtaskInfo):
+        dnn_output = self._ahead_of_time_outputs.pop_dnn_output(subtask_info)
+        return dnn_output
+        
+    def init_garbage_subtask_collector(self):
+        garbage_subtask_collector_thread = threading.Thread(target=self.garbage_subtask_collector, args=())
+        garbage_subtask_collector_thread.start()
 
-    def garbage_job_collector(self):
+        garbage_dnn_output_collector_thread = threading.Thread(target=self.garbage_dnn_output_collector, args=())
+        garbage_dnn_output_collector_thread.start()
+
+    def garbage_subtask_collector(self):
         collect_garbage_job_time = self._network_info.get_collect_garbage_job_time()
         while True:
             time.sleep(collect_garbage_job_time)
 
-            self._virtual_queue.garbage_job_collector(collect_garbage_job_time)
+            self._virtual_queue.garbage_subtask_collector(collect_garbage_job_time)
+
+    def garbage_dnn_output_collector(self):
+        collect_garbage_job_time = self._network_info.get_collect_garbage_job_time()
+        while True:
+            time.sleep(collect_garbage_job_time)
+
+            self._ahead_of_time_outputs.garbage_dnn_output_collector(collect_garbage_job_time)
 
     def get_backlogs(self):
         return self._virtual_queue.get_backlogs()
@@ -63,7 +80,7 @@ class JobManager:
             dnn_output = subtask.run(data)
 
             return dnn_output
-
+        
     # add subtask_info based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):
         job_name = subtask_info.get_job_name()
@@ -83,3 +100,12 @@ class JobManager:
         
         if not success_add_subtask_info:
             raise Exception(f"Subtask already exists. : {subtask_info.get_subtask_id()}")
+        
+    # add dnn_output if schedule is not arrived yet
+    def add_dnn_output(self, previous_dnn_output: DNNOutput):
+        subtask_info = previous_dnn_output.get_subtask_info()
+        success_add_dnn_output = self._ahead_of_time_outputs.add_dnn_output(subtask_info, previous_dnn_output)
+        
+        if not success_add_dnn_output:
+            raise Exception(f"DNNOutput already exists. : {previous_dnn_output.get_subtask_info().get_subtask_id()}")
+

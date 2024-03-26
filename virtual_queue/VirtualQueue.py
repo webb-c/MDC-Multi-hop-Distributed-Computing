@@ -2,7 +2,6 @@ from typing import Tuple, Dict
 from job import DNNSubtask, SubtaskInfo
 
 import threading
-import time
 try:
     from time import time_ns
 except ImportError:
@@ -13,15 +12,15 @@ except ImportError:
         return int(now.timestamp() * 1e9)
 
 class VirtualQueue:
-    def __init__(self, address):
-        self.address = address
+    def __init__(self):
         self.subtask_infos: Dict[SubtaskInfo, Tuple[DNNSubtask, int]] = dict()
         self.mutex = threading.Lock()
 
-    def garbage_job_collector(self, collect_garbage_job_time: int):
+    def garbage_subtask_collector(self, collect_garbage_job_time: int):
         cur_time = time_ns()
         self.mutex.acquire()
         keys_to_delete = [subtask_info for subtask_info, (dnn_subtask, start_time_nano) in self.subtask_infos.items() if cur_time - start_time_nano >= collect_garbage_job_time * 1_000_000_000]
+
         for k in keys_to_delete:
             del self.subtask_infos[k]
 
@@ -29,9 +28,9 @@ class VirtualQueue:
 
         self.mutex.release()
 
-    def exist_subtask_info(self, id):
+    def exist_subtask_info(self, subtask_info: SubtaskInfo):
         self.mutex.acquire()
-        result = id in self.subtask_infos
+        result = subtask_info in self.subtask_infos
         self.mutex.release()
         return result
 

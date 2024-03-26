@@ -62,6 +62,10 @@ class MDC(Program):
         subtask_info: SubtaskInfo = pickle.loads(data)
 
         self._job_manager.add_subtask(subtask_info)
+
+        if self._job_manager.is_dnn_output_exists(subtask_info):
+            dnn_output = self._job_manager.pop_dnn_output(subtask_info) # make another method
+            self.run_dnn(dnn_output)
     
     def handle_network_info(self, topic, data, publisher):
         self._network_info: NetworkInfo = pickle.loads(data)
@@ -97,7 +101,9 @@ class MDC(Program):
 
     def handle_dnn(self, topic, data, publisher):
         previous_dnn_output: DNNOutput = pickle.loads(data)
+        self.run_dnn(previous_dnn_output)
 
+    def run_dnn(self, previous_dnn_output: DNNOutput):
         # terminal node
         if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
             subtask_info = previous_dnn_output.get_subtask_info()
@@ -120,7 +126,8 @@ class MDC(Program):
                 # send job to next node
                 publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
             else:
-                print(f"{previous_dnn_output.get_subtask_info()} is not exists. It may be deleted.")
+                self._job_manager.add_dnn_output(previous_dnn_output)
+
        
 if __name__ == '__main__':
     sub_config = {

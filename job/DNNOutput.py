@@ -32,3 +32,9 @@ class DNNOutput:
             return True
         else:
             return False
+        
+    def __eq__(self, other):
+        return self.get_subtask_info().get_subtask_id() == other.get_subtask_info().get_subtask_id()
+    
+    def __hash__(self):
+        return hash(self.get_subtask_info().get_subtask_id())

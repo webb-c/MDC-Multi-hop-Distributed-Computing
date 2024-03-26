@@ -1,1 +1,2 @@
 from virtual_queue.VirtualQueue import VirtualQueue
+from virtual_queue.AheadOutputQueue import AheadOutputQueue
