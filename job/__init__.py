@@ -8,7 +8,8 @@ from job.Job import Job
 from job.DNNModels import DNNModels
 from job.Subtask import Subtask
 
-
 from job.JobManager import JobManager
 
 from job.SubtaskInfo import SubtaskInfo
+
+from job.CapacityManager import CapacityManager

@@ -42,6 +42,8 @@ class MDC(Program):
         self._job_manager = None
         self._neighbors = None
 
+        self._capacity_manager = CapacityManager()
+
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher, self.topic_dispatcher_checker)
 
         self.request_network_info()
@@ -75,11 +77,23 @@ class MDC(Program):
 
 
     def handle_request_backlog(self, topic, data, publisher):
+        # transfer capacity check current capacity every sync time.
+        self._capacity_manager.update_transfer_capacity()
+
         links = self._job_manager.get_backlogs()
         if len(links) == 0:
             return
+        
+        computing_capacity = self._capacity_manager.get_computing_capacity()
+        transfer_capacity = self._capacity_manager.get_transfer_capacity()
 
-        node_link_info = NodeLinkInfo(self._address, links)
+        node_link_info = NodeLinkInfo(
+            ip = self._address, 
+            links = links, 
+            computing_capacity = computing_capacity, 
+            transfer_capacity = transfer_capacity
+            )
+        
         node_link_info_bytes = pickle.dumps(node_link_info)
 
         # send NodeLinkInfo byte to source ip (response)
@@ -115,7 +129,7 @@ class MDC(Program):
         else: 
             if self._job_manager.is_subtask_exists(previous_dnn_output):
                 # if this is intermidiate node
-                dnn_output = self._job_manager.run(previous_dnn_output)
+                dnn_output, computing_capacity = self._job_manager.run(previous_dnn_output)
                 subtask_info = dnn_output.get_subtask_info()
                 destination_ip = subtask_info.get_destination().get_ip()
 
@@ -125,6 +139,8 @@ class MDC(Program):
                     
                 # send job to next node
                 publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
+
+                self._capacity_manager.update_computing_capacity(computing_capacity)
             else:
                 self._job_manager.add_dnn_output(previous_dnn_output)
 
