@@ -56,7 +56,7 @@ class JobManager:
             data = output.get_output().to(self._device)
 
             # run job
-            dnn_output = subtask.run(data).to("cpu")
+            dnn_output = subtask.run(data)
 
             return dnn_output
 

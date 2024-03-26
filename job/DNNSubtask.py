@@ -30,11 +30,11 @@ class DNNSubtask:
         # transimission
         if self._subtask_info.is_transmission():
             # just copy the data and make DNNOutput object
-            dnn_output = DNNOutput(data, self._subtask_info)
+            dnn_output = DNNOutput(data.to("cpu"), self._subtask_info)
         # computing dnn
         elif self._subtask_info.is_computing():
             with torch.no_grad():
                 output: torch.Tensor = self._dnn_model(data)
-            dnn_output = DNNOutput(output, self._subtask_info)
+            dnn_output = DNNOutput(output.to("cpu"), self._subtask_info)
         
         return dnn_output
