@@ -32,7 +32,6 @@ class LayeredGraph:
             self.set_link(link, links[link])
 
     def set_capacity(self, source_ip: str, computing_capacity: float, transfer_capacity: float):
-        print(self._capacity)
         for destination_ip in self._capacity[source_ip]:
             if source_ip == destination_ip:
                 self._capacity[source_ip][destination_ip] = computing_capacity
