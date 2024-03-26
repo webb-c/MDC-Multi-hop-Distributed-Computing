@@ -32,6 +32,8 @@ class DNNModels:
         model_name = job["model_name"]
         model, flatten_index = load_model(model_name)
 
+        model = model.to(self._device)
+
         for split_point in job["split_points"]:
             subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
             self.append_subtask(job_name, subtask)
@@ -42,7 +44,7 @@ class DNNModels:
 
         with torch.no_grad():
 
-            x = torch.zeros(job["warmup_input"]).to(self._device)
+            x = torch.zeros(job["warmup_input"])
             for index, subtask in enumerate(self._subtasks[job_name]):
                 input_shape = tuple(x.shape)
                 print(input_shape)
