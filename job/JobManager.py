@@ -21,7 +21,7 @@ class JobManager:
 
         self._dnn_models = DNNModels(self._network_info, self._device)
 
-        
+        print(self._device)
         
         self.init_garbage_job_collector()
 
