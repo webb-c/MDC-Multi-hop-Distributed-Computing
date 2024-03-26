@@ -156,8 +156,8 @@ class Controller(Program):
         while True:
             time.sleep(self._network_info.get_sync_time())
             self.sync_backlog()
-            
-            backlog_log_file_path = f"{self._latency_log_path}/total_backlog.csv"
+
+            backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
             save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
 
 
