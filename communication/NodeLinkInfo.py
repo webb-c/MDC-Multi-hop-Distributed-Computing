@@ -15,3 +15,9 @@ class NodeLinkInfo:
 
     def get_links(self):
         return self._links
+    
+    def get_computing_capacity(self):
+        return self._computing_capacity
+    
+    def get_transfer_capacity(self):
+        return self._transfer_capacity

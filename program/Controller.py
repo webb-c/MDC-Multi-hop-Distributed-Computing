@@ -111,6 +111,7 @@ class Controller(Program):
             links.setdefault(link, 0)
 
         self._layered_graph.set_graph(links)
+        self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
     def handle_request_scheduling(self, topic, payload, publisher):
         self._layered_graph.update_graph()
