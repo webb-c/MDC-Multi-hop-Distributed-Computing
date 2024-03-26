@@ -65,23 +65,23 @@ class DNNModels:
         print(self._transfer_ratios[job_name])
 
     def append_subtask(self, job_name: str, subtask: torch.nn.Module):
-        if job_name in self._subtasks:
-            self._subtasks[job_name].append(subtask)
-        else:
+        if job_name not in self._subtasks:
             self._subtasks[job_name] = []
+        
+        self._subtasks[job_name].append(subtask)
 
     def append_computing(self, job_name: str, computing: float):
-        if job_name in self._computing_ratios:
-            self._computing_ratios[job_name].append(computing)
-        else:
+        if job_name not in self._computing_ratios:
             self._computing_ratios[job_name] = []
 
+        self._computing_ratios[job_name].append(computing)
+
     def append_transfer(self, job_name: str, transfer: float):
-        if job_name in self._transfer_ratios:
-            self._transfer_ratios[job_name].append(transfer)
-        else:
+        if job_name not in self._transfer_ratios:
             self._transfer_ratios[job_name] = []
 
+        self._transfer_ratios[job_name].append(transfer)
+        
     def warmup_model(self, job_name: str, warmup_input: torch.Tensor):
         with torch.no_grad():
             x = warmup_input
