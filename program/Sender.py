@@ -61,6 +61,8 @@ class Sender(MDC):
 
         self._job_manager.add_subtask(subtask_info)
 
+        print(f"i get {subtask_info.get_job_id()}")
+
         subtask_layer_node = subtask_info.get_source()
 
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
