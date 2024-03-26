@@ -34,6 +34,7 @@ class DNNModels:
         for split_point in job["split_points"]:
             print(split_point)
             subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
+            print(subtask)
             self.append_subtask(job_name, subtask)
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
