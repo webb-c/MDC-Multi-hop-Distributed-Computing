@@ -11,7 +11,11 @@ import time
 
 class JobManager:
     def __init__(self, address, network_info: NetworkInfo):
-        self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        # TODO
+        if address != "192.168.1.5":
+            self._device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            self._device = "cpu"
 
         self._models : Dict[str, List] = dict()
 
