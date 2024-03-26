@@ -43,11 +43,12 @@ class DNNModels:
 
         x = torch.zeros(job["warmup_input"])
         for index, subtask in enumerate(self._subtasks[job_name]):
-            x : torch.Tensor = subtask(x)
             input_shape = tuple(x.shape)
             print(input_shape)
 
             flops, _, _ = calculate_flops(model=subtask, input_shape=input_shape, output_as_string=False, output_precision=4, print_results=False)
+
+            x : torch.Tensor = subtask(x)
 
             computings[index] = flops
             transfers[index] = sys.getsizeof(x.storage())
