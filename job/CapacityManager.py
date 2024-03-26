@@ -13,8 +13,8 @@ class CapacityManager:
     def __init__(self):
         self._sample_num = 100
 
-        self._received = psutil.net_io_counters().bytes_recv
-        # self._sent = psutil.net_io_counters().bytes_sent
+        # self._received = psutil.net_io_counters().bytes_recv
+        self._sent = psutil.net_io_counters().bytes_sent
         self._last_transfer_check_time = time.time()
 
         self._computing_capacities = []
@@ -24,16 +24,16 @@ class CapacityManager:
         self._transfer_capacity_avg = 0
 
     def _check_and_get_current_transfer_capacity(self):
-        cur_received = psutil.net_io_counters().bytes_recv
-        # cur_sent = psutil.net_io_counters().bytes_sent
+        # cur_received = psutil.net_io_counters().bytes_recv
+        cur_sent = psutil.net_io_counters().bytes_sent
         cur_time = time.time()
 
-        received_delta = cur_received / cur_time - self._last_transfer_check_time if cur_time - self._last_transfer_check_time > 1e-10 else 0
+        sent_delta = (cur_sent - self._sent) / (cur_time - self._last_transfer_check_time) if cur_time - self._last_transfer_check_time > 1e-10 else 0
 
-        self._received = cur_received
+        self._sent = cur_sent
         self._last_transfer_check_time = cur_time
 
-        return received_delta
+        return sent_delta
 
     def update_computing_capacity(self, computing_capacity):
         self._computing_capacities.append(computing_capacity)
