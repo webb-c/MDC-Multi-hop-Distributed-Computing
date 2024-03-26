@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import torch
 
 from job import *
@@ -8,6 +8,15 @@ from virtual_queue import VirtualQueue, AheadOutputQueue
 
 import threading
 import time
+
+try:
+    from time import time_ns
+except ImportError:
+    from datetime import datetime
+    # For compatibility with Python 3.6
+    def time_ns():
+        now = datetime.now()
+        return int(now.timestamp() * 1e9)
 
 class JobManager:
     def __init__(self, address, network_info: NetworkInfo):
@@ -67,7 +76,7 @@ class JobManager:
     def get_backlogs(self):
         return self._virtual_queue.get_backlogs()
 
-    def run(self, output: DNNOutput) -> DNNOutput:
+    def run(self, output: DNNOutput) -> Tuple[DNNOutput, float]:
         previous_subtask_info = output.get_subtask_info()
         if previous_subtask_info.get_job_type() == "dnn":
             # get next destination
@@ -76,10 +85,16 @@ class JobManager:
             # get output data == get current subtask's input
             data = output.get_output().to(self._device)
 
+            start_time = time_ns() / 1_000_000_000 # ns to s
+
             # run job
             dnn_output = subtask.run(data)
 
-            return dnn_output
+            end_time = time_ns() / 1_000_000_000 # ns to s
+
+            computing_capacity = subtask.get_backlog() / (end_time - start_time) if subtask.get_backlog() > 0 else 0
+
+            return dnn_output, computing_capacity
         
     # add subtask_info based SubtaskInfo
     def add_subtask(self, subtask_info: SubtaskInfo):

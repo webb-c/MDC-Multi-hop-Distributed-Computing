@@ -66,7 +66,7 @@ class Sender(MDC):
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
             job_id = subtask_info.get_job_id()
             input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]).float().view(1, TARGET_DEPTH, TARGET_HEIGHT, TARGET_WIDTH), subtask_info)
-            dnn_output = self._job_manager.run(input_frame)
+            dnn_output, computing_capacity = self._job_manager.run(input_frame)
             destination_ip = subtask_info.get_destination().get_ip()
 
 
@@ -76,8 +76,9 @@ class Sender(MDC):
                 
             # send job to next node
             publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
+
+            self._capacity_manager.update_computing_capacity(computing_capacity)
        
-            
     def stream_player(self):
         c = np.ndarray(self._shape, dtype=np.uint8, buffer=self._map_file)
 

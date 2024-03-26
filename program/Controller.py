@@ -40,6 +40,7 @@ class Controller(Program):
         self.init_path()
         self.init_layered_graph()
         self.init_garbage_job_collector()
+        self.init_record_virtual_backlog()
 
     def init_network_info(self):
         with open("config.json", 'r') as file:
@@ -76,6 +77,16 @@ class Controller(Program):
 
             self._job_list_mutex.release()
 
+    def init_record_virtual_backlog(self):
+        record_virtual_backlog_thread = threading.Thread(target=self.record_virtual_backlog, args=())
+        record_virtual_backlog_thread.start()
+
+    def record_virtual_backlog(self):
+        while True:
+            time.sleep(0.1)
+            backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
+            save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
+
     def handle_network_info(self, topic, payload, publisher):
         # get source ip address
         node_info: NodeInfo = pickle.loads(payload)
@@ -111,6 +122,7 @@ class Controller(Program):
             links.setdefault(link, 0)
 
         self._layered_graph.set_graph(links)
+        self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
     def handle_request_scheduling(self, topic, payload, publisher):
         self._layered_graph.update_graph()
@@ -157,9 +169,6 @@ class Controller(Program):
         while True:
             time.sleep(self._network_info.get_sync_time())
             self.sync_backlog()
-
-            backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
-            save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
 
 
 if __name__ == '__main__':

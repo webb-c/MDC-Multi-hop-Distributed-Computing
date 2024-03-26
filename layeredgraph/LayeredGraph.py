@@ -18,6 +18,7 @@ class LayeredGraph:
         self._layer_node_pairs = []
         self._scheduling_algorithm = None
         self._previous_update_time = time.time()
+        self._capacity = dict()
 
         self._max_layer_depth = 0
 
@@ -29,6 +30,13 @@ class LayeredGraph:
         for link in links:
             link: LayerNodePair
             self.set_link(link, links[link])
+
+    def set_capacity(self, source_ip: str, computing_capacity: float, transfer_capacity: float):
+        for destination_ip in self._capacity[source_ip]:
+            if source_ip == destination_ip:
+                self._capacity[source_ip][destination_ip] = computing_capacity
+            else:
+                self._capacity[source_ip][destination_ip] = transfer_capacity
         
     def update_graph(self):
         current_time = time.time()
@@ -47,13 +55,13 @@ class LayeredGraph:
             if self._layered_graph_backlog[link] > 0:
                 destinations[destination_node_ip] += 1
 
-        for source in self._layer_node_pairs:
+        for link in self._layer_node_pairs:
             link: LayerNodePair
             source_node_ip = link.get_source().get_ip()
             destination_node_ip = link.get_destination().get_ip()
             
             link_job_num = links_job_num[source_node_ip][destination_node_ip]
-            capacity = self._network_info.get_capacity()[source_node_ip][destination_node_ip]
+            capacity = self._capacity[source_node_ip][destination_node_ip]
 
             if link_job_num > 0:
                 job_computing_delta = elapsed_time * capacity / link_job_num
@@ -76,7 +84,13 @@ class LayeredGraph:
                 if source not in self._layered_graph:
                     self._layered_graph[source] = []
 
+                if source_ip not in self._capacity:
+                    self._capacity[source_ip] = dict()
+
                 for destination_ip in self._network[source_ip]:
+                    if destination_ip not in self._capacity[source_ip]:
+                        self._capacity[source_ip][destination_ip] = 0
+
                     destination = LayerNode(destination_ip, layer)
 
                     self._layered_graph[source].append(destination)
@@ -90,6 +104,9 @@ class LayeredGraph:
             for source_ip in self._network:
                 source = LayerNode(source_ip, layer)
                 destination = LayerNode(source_ip, layer + 1)
+
+                if source_ip not in self._capacity[source_ip]:
+                    self._capacity[source_ip][source_ip] = 0
 
                 if source not in self._layered_graph:
                     self._layered_graph[source] = []
