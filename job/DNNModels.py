@@ -45,6 +45,7 @@ class DNNModels:
             for index, subtask in enumerate(self._subtasks[job_name]):
                 input_shape = tuple(x.shape)
                 print(input_shape)
+                print(subtask.device)
 
                 if index == 0:
                     flops = 0
