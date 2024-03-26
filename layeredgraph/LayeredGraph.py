@@ -129,5 +129,8 @@ class LayeredGraph:
 
         return links
     
+    def get_layered_graph_backlog(self):
+        return self._layered_graph_backlog
+    
     
 
