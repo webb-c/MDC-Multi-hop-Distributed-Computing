@@ -45,7 +45,6 @@ class DNNModels:
             x = torch.zeros(job["warmup_input"]).to(self._device)
             for index, subtask in enumerate(self._subtasks[job_name]):
                 input_shape = tuple(x.shape)
-                print(input_shape)
 
                 if index == 0:
                     flops = 0
@@ -62,9 +61,6 @@ class DNNModels:
 
         self._computing_ratios[job_name] = computings.tolist()
         self._transfer_ratios[job_name] = transfers.tolist()
-
-        print(self._computing_ratios[job_name])
-        print(self._transfer_ratios[job_name])
 
     def append_subtask(self, job_name: str, subtask: torch.nn.Module):
         if job_name not in self._subtasks:
