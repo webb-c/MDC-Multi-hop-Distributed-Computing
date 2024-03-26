@@ -42,8 +42,6 @@ class CapacityManager:
 
         self._computing_capacity_avg = sum(self._computing_capacities) / len(self._computing_capacities)
 
-        print(f"computing_capacity : {self._computing_capacity_avg}")
-
     def update_transfer_capacity(self):
         transfer_capacity = self._check_and_get_current_transfer_capacity()
 
@@ -52,8 +50,6 @@ class CapacityManager:
         self._transfer_capacities = self._transfer_capacities[-self._sample_num:]
 
         self._transfer_capacity_avg = sum(self._transfer_capacities) / len(self._transfer_capacities)
-
-        print(f"transfer_capacity : {self._transfer_capacity_avg}")
 
     def get_computing_capacity(self):
         return self._computing_capacity_avg
