@@ -51,7 +51,7 @@ class CapacityManager:
 
         self._transfer_capacities = self._transfer_capacities[-self._sample_num:]
 
-        self._transfer_capacity_avg = sum(self._transfer_capacities) / len(self._sample_num)
+        self._transfer_capacity_avg = sum(self._transfer_capacities) / len(self._transfer_capacities)
 
         print(f"transfer_capacity : {self._transfer_capacity_avg}")
 
