@@ -41,23 +41,28 @@ class DNNModels:
         computings = torch.zeros(len(self._subtasks[job_name]))
         transfers = torch.zeros(len(self._subtasks[job_name]))
 
-        x = torch.zeros(job["warmup_input"])
-        for index, subtask in enumerate(self._subtasks[job_name]):
-            input_shape = tuple(x.shape)
-            print(input_shape)
+        with torch.no_grad():
 
-            flops, _, _ = calculate_flops(model=subtask, input_shape=input_shape, output_as_string=False, output_precision=4, print_results=False)
+            x = torch.zeros(job["warmup_input"])
+            for index, subtask in enumerate(self._subtasks[job_name]):
+                input_shape = tuple(x.shape)
+                print(input_shape)
 
-            x : torch.Tensor = subtask(x)
+                flops, _, _ = calculate_flops(model=subtask, input_shape=input_shape, output_as_string=False, output_precision=4, print_results=False)
 
-            computings[index] = flops
-            transfers[index] = sys.getsizeof(x.storage())
+                x : torch.Tensor = subtask(x)
+
+                computings[index] = flops
+                transfers[index] = sys.getsizeof(x.storage())
 
         computings = computings / transfers[0] # normalize with input size
         transfers = transfers / transfers[0]
 
         self._computing_ratios[job_name] = computings.tolist()
         self._transfer_ratios[job_name] = transfers.tolist()
+
+        print(self._computing_ratios[job_name])
+        print(self._transfer_ratios[job_name])
 
     def append_subtask(self, job_name: str, subtask: torch.nn.Module):
         if job_name in self._subtasks:
