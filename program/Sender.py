@@ -50,8 +50,9 @@ class Sender(MDC):
         job_type = self._network_info.get_jobs()[self._job_name]["job_type"]
         job_name = self._job_name
         start_time = time_ns()
+        input_size = None # should be initiailzed
 
-        job_info = JobInfo(source_ip, terminal_destination, job_type, job_name, start_time)
+        job_info = JobInfo(source_ip, terminal_destination, job_type, job_name, start_time, input_size)
 
         self._job_info = job_info
 
@@ -112,9 +113,22 @@ class Sender(MDC):
                 self._job_info.set_start_time(time_ns())
                 return True
             
+    def set_job_info_input_size(self, frame: np.array):
+        if self._network_info == None:
+            return False
+        
+        else:
+            if self._job_info == None:
+                self.init_job_info()
+                return True
+            else:
+                input_size = sys.getsizeof(torch.tensor(frame).storage())
+                self._job_info.set_input_size(input_size)
+                return True
+            
     def wait_until_can_send(self):
+        print("Waiting for network info.")
         while not (self.check_job_manager_exists() and self.check_network_info_exists()):
-            print("Waiting for network info.")
             time.sleep(1.0)
             
     def run_camera_streamer(self):
@@ -122,9 +136,10 @@ class Sender(MDC):
         streamer_thread.start()
 
     def send_frame(self):
-        if self.set_job_info_time():
+        current_frame = self._frame
+        if self.set_job_info_time() and self.set_job_info_input_size(current_frame):
             job_info_bytes = pickle.dumps(self._job_info)
-            self._frame_list[self._job_info.get_job_id()] = self._frame
+            self._frame_list[self._job_info.get_job_id()] = current_frame
 
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
         

@@ -112,7 +112,10 @@ class LayeredGraph:
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
 
         return path
-     
+    
+    # Method that return all layered grph's links of layer_node_ip.
+    # ex) layer_node_ip : 192.168.1.5
+    # return : LayerNodePair(192.168.1.5-0, 192.168.1.6-0), LayerNodePair(192.168.1.5-1, 192.168.1.6-1) ...
     def get_links(self, layer_node_ip: str):
         links = []
         for layer in range(self._max_layer_depth):
@@ -125,6 +128,9 @@ class LayeredGraph:
                 links.append(link)
 
         return links
+    
+    def get_layered_graph_backlog(self):
+        return self._layered_graph_backlog
     
     
 

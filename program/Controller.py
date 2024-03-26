@@ -6,7 +6,7 @@ from program import Program
 from communication import *
 from layeredgraph import LayeredGraph, LayerNode
 from job import JobInfo, SubtaskInfo
-from utils import save_latency
+from utils import save_latency, save_virtual_backlog
 
 import pickle, json
 import paho.mqtt.publish as publish
@@ -28,7 +28,8 @@ class Controller(Program):
 
         super().__init__(self.sub_config, self.pub_configs, self.topic_dispatcher)
 
-        self._log_path = None
+        self._latency_log_path = None
+        self._backlog_log_path = None
         self._network_info: NetworkInfo = None
         self._layered_graph = None
         
@@ -46,8 +47,11 @@ class Controller(Program):
             self._network_info = netork_info
 
     def init_path(self):
-        self._log_path = f"./results/{self._network_info.get_experiment_name()}"
-        os.makedirs(self._log_path, exist_ok=True)
+        self._latency_log_path = f"./results/{self._network_info.get_experiment_name()}/latency"
+        os.makedirs(self._latency_log_path, exist_ok=True)
+
+        self._backlog_log_path = f"./results/{self._network_info.get_experiment_name()}/backlog"
+        os.makedirs(self._backlog_log_path, exist_ok=True)
         
     def init_layered_graph(self):
         self._layered_graph = LayeredGraph(self._network_info)
@@ -116,6 +120,7 @@ class Controller(Program):
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
+        print(path)
 
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
             model_index = 1
@@ -130,10 +135,7 @@ class Controller(Program):
             if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
                 model_index += 1
 
-            computing = self._network_info.get_jobs()[job_info.get_job_name()]["computing"][model_index]
-            transfer = self._network_info.get_jobs()[job_info.get_job_name()]["transfer"][model_index]
-
-            subtask_info = SubtaskInfo(job_info, model_index, source_layer_node, destination_layer_node, future_destination_layer_node, computing, transfer)
+            subtask_info = SubtaskInfo(job_info, model_index, source_layer_node, destination_layer_node, future_destination_layer_node)
             subtask_info_bytes = pickle.dumps(subtask_info)
 
             # send SubtaskInfo byte to source ip
@@ -148,13 +150,16 @@ class Controller(Program):
         finish_time = time.time_ns()
 
         latency = finish_time - start_time
-        file_path = f"{self._log_path}/{subtask_info.get_job_name()}"
-        save_latency(file_path, latency)
+        latency_log_file_path = f"{self._latency_log_path}/{subtask_info.get_job_name()}.csv"
+        save_latency(latency_log_file_path, latency)
 
     def start(self):
         while True:
             time.sleep(self._network_info.get_sync_time())
             self.sync_backlog()
+
+            backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
+            save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
 
 
 if __name__ == '__main__':
