@@ -9,7 +9,7 @@ class SubtaskInfo(JobInfo):
         self._destination_layer_node = destination_layer_node
         self._future_destination_layer_node = future_destination_layer_node
 
-        super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name(), job_info.get_start_time())
+        super().__init__(job_info.get_job_id(), job_info.get_terminal_destination(), job_info.get_job_type(), job_info.get_job_name(), job_info.get_start_time(), job_info.get_input_size())
     
     def get_model_index(self):
         return self._model_index
