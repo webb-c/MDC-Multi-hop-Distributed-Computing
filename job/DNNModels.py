@@ -8,8 +8,9 @@ from calflops import calculate_flops
 import sys
 
 class DNNModels:
-    def __init__(self, network_info: NetworkInfo):
+    def __init__(self, network_info: NetworkInfo, device):
         self._network_info = network_info
+        self._device = device
 
         self._jobs: List[str] = []
         self._subtasks: Dict[str, List[torch.nn.Module]] = dict()
@@ -32,7 +33,7 @@ class DNNModels:
         model, flatten_index = load_model(model_name)
 
         for split_point in job["split_points"]:
-            subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
+            subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
             self.append_subtask(job_name, subtask)
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
@@ -41,11 +42,10 @@ class DNNModels:
 
         with torch.no_grad():
 
-            x = torch.zeros(job["warmup_input"])
+            x = torch.zeros(job["warmup_input"]).to(self._device)
             for index, subtask in enumerate(self._subtasks[job_name]):
                 input_shape = tuple(x.shape)
                 print(input_shape)
-                print(subtask.device)
 
                 if index == 0:
                     flops = 0

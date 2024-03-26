@@ -11,13 +11,17 @@ import time
 
 class JobManager:
     def __init__(self, address, network_info: NetworkInfo):
+        self._device = "cuda" if torch.cuda.is_available() else "cpu"
+
         self._models : Dict[str, List] = dict()
 
         self._network_info = network_info
 
         self._virtual_queue = VirtualQueue(address)
 
-        self._dnn_models = DNNModels(self._network_info)
+        self._dnn_models = DNNModels(self._network_info, self._device)
+
+        
         
         self.init_garbage_job_collector()
 
@@ -49,10 +53,10 @@ class JobManager:
             subtask: DNNSubtask = self._virtual_queue.pop_subtask_info(previous_subtask_info)
 
             # get output data == get current subtask's input
-            data = output.get_output()
+            data = output.get_output().to(self._device)
 
             # run job
-            dnn_output = subtask.run(data)
+            dnn_output = subtask.run(data).to("cpu")
 
             return dnn_output
 
