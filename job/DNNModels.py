@@ -62,6 +62,8 @@ class DNNModels:
         self._computing_ratios[job_name] = computings.tolist()
         self._transfer_ratios[job_name] = transfers.tolist()
 
+        print(f"Succesfully load {job_name}")
+
     def append_subtask(self, job_name: str, subtask: torch.nn.Module):
         if job_name not in self._subtasks:
             self._subtasks[job_name] = []
