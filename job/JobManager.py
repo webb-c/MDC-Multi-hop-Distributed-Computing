@@ -85,12 +85,12 @@ class JobManager:
             # get output data == get current subtask's input
             data = output.get_output().to(self._device)
 
-            start_time = time.time_ns() / 1_000_000_000 # ns to s
+            start_time = time_ns() / 1_000_000_000 # ns to s
 
             # run job
             dnn_output = subtask.run(data)
 
-            end_time = time.time_ns() / 1_000_000_000 # ns to s
+            end_time = time_ns() / 1_000_000_000 # ns to s
 
             computing_capacity = subtask.get_backlog() / (end_time - start_time) if subtask.get_backlog() > 0 else 0
 
