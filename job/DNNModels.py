@@ -32,9 +32,7 @@ class DNNModels:
         model, flatten_index = load_model(model_name)
 
         for split_point in job["split_points"]:
-            print(split_point)
             subtask : torch.nn.Module = split_model(model, split_point, flatten_index)
-            print(subtask)
             self.append_subtask(job_name, subtask)
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
@@ -48,7 +46,10 @@ class DNNModels:
                 input_shape = tuple(x.shape)
                 print(input_shape)
 
-                flops, _, _ = calculate_flops(model=subtask, input_shape=input_shape, output_as_string=False, output_precision=4, print_results=False)
+                if index == 0:
+                    flops = 0
+                else:
+                    flops, _, _ = calculate_flops(model=subtask, input_shape=input_shape, output_as_string=False, output_precision=4, print_results=False)
 
                 x : torch.Tensor = subtask(x)
 
