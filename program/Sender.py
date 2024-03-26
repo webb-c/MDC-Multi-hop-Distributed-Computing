@@ -61,8 +61,6 @@ class Sender(MDC):
 
         self._job_manager.add_subtask(subtask_info)
 
-        print(f"i get {subtask_info.get_job_id()}")
-
         subtask_layer_node = subtask_info.get_source()
 
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
@@ -129,8 +127,8 @@ class Sender(MDC):
                 return True
             
     def wait_until_can_send(self):
+        print("Waiting for network info.")
         while not (self.check_job_manager_exists() and self.check_network_info_exists()):
-            print("Waiting for network info.")
             time.sleep(1.0)
             
     def run_camera_streamer(self):

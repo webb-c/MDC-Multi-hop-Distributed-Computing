@@ -120,6 +120,7 @@ class Controller(Program):
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
+        print(path)
 
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
             model_index = 1
