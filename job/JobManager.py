@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import torch
 
 from job import *
@@ -76,7 +76,7 @@ class JobManager:
     def get_backlogs(self):
         return self._virtual_queue.get_backlogs()
 
-    def run(self, output: DNNOutput) -> tuple[DNNOutput, float]:
+    def run(self, output: DNNOutput) -> Tuple[DNNOutput, float]:
         previous_subtask_info = output.get_subtask_info()
         if previous_subtask_info.get_job_type() == "dnn":
             # get next destination
