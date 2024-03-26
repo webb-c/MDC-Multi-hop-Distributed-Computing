@@ -36,8 +36,7 @@ def get_ip_address_linux(interface_name='eth0'):
         return "Failed to execute ip command or interface not found"
     
 
-def save_latency(file_name, latency):
-    file_path = f"{file_name}.csv"
+def save_latency(file_path, latency):
     # 파일이 존재하는지 확인
     file_exists = os.path.exists(file_path)
 
@@ -49,10 +48,32 @@ def save_latency(file_name, latency):
         
         # 파일이 새로 만들어진 경우 열 이름을 씁니다.
         if not file_exists:
-            writer.writerow(['latency'])
+            writer.writerow(["latency"])
         
         # 데이터 행을 파일에 씁니다.
         writer.writerow([latency])
+
+def save_virtual_backlog(file_path, virtual_backlog):
+    # 파일이 존재하는지 확인
+    file_exists = os.path.exists(file_path)
+
+    sorted_virtual_backlog = sorted(virtual_backlog.items(), key=lambda item: item[0])
+    links = [link.to_string() for link, _ in sorted_virtual_backlog]
+    backlogs = [backlog for _, backlog in sorted_virtual_backlog]
+
+    backlog_sum = sum(backlogs)
+    backlog_avg = backlog_sum / len(backlogs) if backlogs else 0
+
+    headers = ["sum", "avg"] + links
+    datas = [backlog_sum, backlog_avg] + backlogs
+
+    with open(file_path, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        if not file_exists:
+            writer.writerow(headers)
+
+        writer.writerow(datas)
 
 
 # def split_model(model, split_point) -> torch.nn.Module:
