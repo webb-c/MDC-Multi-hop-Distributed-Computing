@@ -57,6 +57,8 @@ class LayeredGraph:
             if self._layered_graph_backlog[link] > 0:
                 destinations[destination_node_ip] += 1
 
+        print("links_job_num", links_job_num)
+
         for link in self._layer_node_pairs:
             link: LayerNodePair
             source_node_ip = link.get_source().get_ip()
