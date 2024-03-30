@@ -1,12 +1,11 @@
-from models.yolo import Detect
 import torch
 import torch.nn as nn
 import yaml
 import numpy as np
-from models.common import Conv, C3, SPPF, Concat
-from models.yolo import Detect
+from yolov5.models.common import Conv, C3, SPPF, Concat
+from yolov5.models.yolo import Detect
 from torch.nn import Upsample
-from utils.general import non_max_suppression
+from yolov5.utils.general import non_max_suppression
 
 device = 'cuda:0'
 
@@ -138,7 +137,7 @@ for part_name, parts  in model_config.items():
 
 i = 0
 for submodule in submodule_list:
-    submodule.load_state_dict(torch.load(f"./weights/P{i}.pt"))
+    submodule.load_state_dict(torch.load(f"yolov5/weights/P{i}.pt"))
     submodule.eval()
     i += 1
 

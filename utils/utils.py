@@ -4,7 +4,7 @@ import csv
 
 import torch
 from torchvision.models import resnet18, mobilenet_v2
-from models.yolov5.Yolov5 import P1, P2, P3, P4
+from yolov5.Yolov5 import P1, P2, P3, P4
 
 def get_ip_address(interface_name=["eth0"]):
     # check os
