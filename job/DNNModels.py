@@ -30,11 +30,21 @@ class DNNModels:
     def add_model(self, job_name: str, job: Dict):
         # load whole dnn model
         model_name = job["model_name"]
-        model, flatten_index = load_model(model_name)
 
-        for split_point in job["split_points"]:
-            subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
-            self.append_subtask(job_name, subtask)
+        if "yolo" not in model_name:
+            model, flatten_index = load_model(model_name)
+
+            for split_point in job["split_points"]:
+                subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
+                self.append_subtask(job_name, subtask)
+
+        else:
+            
+            models = load_model(model_name)
+
+            for model in models:
+                subtask : torch.nn.Module = model.to(self._device)
+                self.append_subtask(job_name, subtask)
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
         computings = torch.zeros(len(self._subtasks[job_name]))
