@@ -4,6 +4,7 @@ import csv
 
 import torch
 from torchvision.models import resnet18, mobilenet_v2
+from models.yolov5.Yolov5 import P1, P2, P3, P4
 
 def get_ip_address(interface_name=["eth0"]):
     # check os
@@ -111,7 +112,8 @@ def load_model(model_name) -> torch.nn.Module:
     assert model_name in available_model_list, f"Model must be in {available_model_list}."
 
     if model_name == "yolov5":
-        return None # TODO
+        models = [P1, P2, P3, P4]
+        return models
     
     elif model_name == "resnet-18":
         model = resnet18(pretrained=True)
