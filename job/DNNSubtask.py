@@ -44,10 +44,10 @@ class DNNSubtask:
                 output: torch.Tensor = self._dnn_model(data)
 
             if isinstance(data, list):
-                data = [d.to("cpu") for d in data]
+                output = [d.to("cpu") for d in output]
             else:
-                data = data.to("cpu")
+                output = output.to("cpu")
 
-            dnn_output = DNNOutput(data, self._subtask_info)
+            dnn_output = DNNOutput(output, self._subtask_info)
         
         return dnn_output
