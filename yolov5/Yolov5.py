@@ -174,6 +174,11 @@ class P1(nn.Module):
         x11 = self.M10(x10)
         x12 = self.M11(x11)
 
+        print("x5", x5.shape)
+        print("x7", x7.shape)
+        print("x9", x9.shape)
+        print("x12", x12.shape)
+
         return [x5, x7, x9, x12]
 
 class P2(nn.Module):
