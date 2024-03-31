@@ -134,11 +134,13 @@ class Controller(Program):
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
 
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
+            start = 1
             model_index = 1
         else:
+            start = 0
             model_index = 0
         
-        for i in range(len(path) - 1):
+        for i in range(start, len(path) - 1):
             source_layer_node: LayerNode = path[i]
             destination_layer_node: LayerNode = path[i + 1]
             future_destination_layer_node: LayerNode = path[i + 2] if i + 2 < len(path) else path[i + 1]
