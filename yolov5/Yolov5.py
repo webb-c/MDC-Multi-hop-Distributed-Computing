@@ -193,7 +193,6 @@ class P2(nn.Module):
         self.M23 = submodule_list[23]
 
     def forward(self, x):
-        print(x.shape)
         x5, x7, x9, x12 = x
         x13 = self.M12(x12)
         x14 = self.M13(x13)
