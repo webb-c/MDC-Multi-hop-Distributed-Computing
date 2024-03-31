@@ -28,7 +28,7 @@ TARGET_HEIGHT = 320
 TARGET_DEPTH = 3
 
 
-class Sender(MDC):
+class CameraSender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
         self._frame = None
@@ -163,5 +163,5 @@ if __name__ == '__main__':
 
     job_name = "test job 1"
 
-    sender = Sender(sub_config, pub_configs, job_name)
+    sender = CameraSender(sub_config, pub_configs, job_name)
     sender.start()
