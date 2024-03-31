@@ -47,6 +47,20 @@ class DNNModels:
                 self.append_subtask(job_name, subtask)
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
+        if "yolo" in job["model_name"]:
+            self._computing_ratios[job_name] = [0, 100, 100, 100, 100] # TODO change to real value
+            self._transfer_ratios[job_name] = [1, 10, 10, 10, 1]
+
+            with torch.no_grad():
+
+                x = torch.zeros(job["warmup_input"]).to(self._device)
+
+                for index, subtask in enumerate(self._subtasks[job_name]):
+                    x : torch.Tensor = subtask(x)
+
+            print(f"Succesfully load {job_name}")
+            return
+
         computings = torch.zeros(len(self._subtasks[job_name]))
         transfers = torch.zeros(len(self._subtasks[job_name]))
 
