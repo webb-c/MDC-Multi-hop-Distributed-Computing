@@ -63,8 +63,6 @@ class MDC(Program):
     def handle_subtask_info(self, topic, data, publisher):
         subtask_info: SubtaskInfo = pickle.loads(data)
 
-        print(print("id", subtask_info.get_job_id()))
-
         self._job_manager.add_subtask(subtask_info)
 
         if self._job_manager.is_dnn_output_exists(subtask_info):
@@ -131,7 +129,6 @@ class MDC(Program):
         else: 
             if self._job_manager.is_subtask_exists(previous_dnn_output):
                 # if this is intermidiate node
-                print("run ", previous_dnn_output.get_subtask_info().get_subtask_id())
                 dnn_output, computing_capacity = self._job_manager.run(previous_dnn_output)
                 subtask_info = dnn_output.get_subtask_info()
                 destination_ip = subtask_info.get_destination().get_ip()
