@@ -44,7 +44,7 @@ class LayeredGraph:
 
         links_job_num = {}
 
-        print("cap", self._capacity)
+        # print("cap", self._capacity)
 
         for link in self._layer_node_pairs:
             link: LayerNodePair
