@@ -43,8 +43,8 @@ class DNNSubtask:
             with torch.no_grad():
                 output: torch.Tensor = self._dnn_model(data)
 
-            if isinstance(data, list):
-                output = [d.to("cpu") for d in output]
+            if isinstance(output, list):
+                output = [o.to("cpu") for o in output]
             else:
                 output = output.to("cpu")
 
