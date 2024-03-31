@@ -134,6 +134,7 @@ class Controller(Program):
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
 
         print("path", path)
+        print("id", job_info.get_job_id())
 
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
             start = 1
