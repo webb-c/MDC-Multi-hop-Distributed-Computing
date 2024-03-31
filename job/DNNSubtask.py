@@ -1,3 +1,5 @@
+from typing import List
+
 import torch
 
 from job import SubtaskInfo, DNNOutput
@@ -26,15 +28,26 @@ class DNNSubtask:
         return self._transfer
     
     # should distinct transimission vs. computing
-    def run(self, data: torch.Tensor):
+    def run(self, data: torch.Tensor | List):
         # transimission
         if self._subtask_info.is_transmission():
             # just copy the data and make DNNOutput object
-            dnn_output = DNNOutput(data.to("cpu"), self._subtask_info)
+            if isinstance(data, list):
+                data = [d.to("cpu") for d in data]
+            else:
+                data = data.to("cpu")
+
+            dnn_output = DNNOutput(data, self._subtask_info)
         # computing dnn
         elif self._subtask_info.is_computing():
             with torch.no_grad():
                 output: torch.Tensor = self._dnn_model(data)
-            dnn_output = DNNOutput(output.to("cpu"), self._subtask_info)
+
+            if isinstance(data, list):
+                data = [d.to("cpu") for d in data]
+            else:
+                data = data.to("cpu")
+
+            dnn_output = DNNOutput(data, self._subtask_info)
         
         return dnn_output

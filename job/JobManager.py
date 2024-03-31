@@ -83,7 +83,12 @@ class JobManager:
             subtask: DNNSubtask = self._virtual_queue.pop_subtask_info(previous_subtask_info)
 
             # get output data == get current subtask's input
-            data = output.get_output().to(self._device)
+            data = output.get_output()
+
+            if isinstance(data, list):
+                data = [d.to(self._device)for d in data]
+            else:
+                data = data.to(self._device)
 
             start_time = time_ns() / 1_000_000_000 # ns to s
 
