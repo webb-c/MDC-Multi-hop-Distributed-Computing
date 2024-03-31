@@ -39,7 +39,6 @@ class DNNModels:
                 self.append_subtask(job_name, subtask)
 
         else:
-            
             models = load_model(model_name)
 
             for model in models:
