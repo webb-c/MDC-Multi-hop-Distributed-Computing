@@ -23,8 +23,8 @@ from utils.utils import get_ip_address
 from program import MDC
 from job import JobInfo, SubtaskInfo, DNNOutput
 
-TARGET_WIDTH = 224
-TARGET_HEIGHT = 224
+TARGET_WIDTH = 320
+TARGET_HEIGHT = 320
 TARGET_DEPTH = 3
 
 

@@ -5,8 +5,8 @@ import mmap
 from jetcam.csi_camera import CSICamera
 from jetcam.utils import bgr8_to_jpeg
 
-TARGET_WIDTH = 224
-TARGET_HEIGHT = 224
+TARGET_WIDTH = 320
+TARGET_HEIGHT = 320
 TARGET_DEPTH = 3
 
 class Camera:
