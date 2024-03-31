@@ -77,8 +77,8 @@ class VideoSender(MDC):
 
         while True:
             ret, frame = cap.read()
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            self._frame = gray
+            resize_frame = cv2.resize(frame, (320, 320), interpolation=cv2.INTER_CUBIC)
+            self._frame = resize_frame
             time.sleep(1 / 30)
 
     def start(self):
