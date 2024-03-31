@@ -69,6 +69,8 @@ class Sender(MDC):
             dnn_output, computing_capacity = self._job_manager.run(input_frame)
             destination_ip = subtask_info.get_destination().get_ip()
 
+            print(dnn_output.get_output().shape)
+
 
             dnn_output.get_subtask_info().set_next_subtask_id()
 
