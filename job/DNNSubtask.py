@@ -28,7 +28,7 @@ class DNNSubtask:
         return self._transfer
     
     # should distinct transimission vs. computing
-    def run(self, data: torch.Tensor | List):
+    def run(self, data: torch.Tensor):
         # transimission
         if self._subtask_info.is_transmission():
             # just copy the data and make DNNOutput object
