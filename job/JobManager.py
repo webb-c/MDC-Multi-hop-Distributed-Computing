@@ -86,7 +86,7 @@ class JobManager:
             data = output.get_output()
 
             if isinstance(data, list):
-                data = [d.to(self._device)for d in data]
+                data = [d.to(self._device) for d in data]
             else:
                 data = data.to(self._device)
 
