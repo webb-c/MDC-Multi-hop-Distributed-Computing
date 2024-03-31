@@ -199,7 +199,7 @@ class P2(nn.Module):
 
     def forward(self, x):
         if len(x) == 1:
-            print(x)
+            print(x.shape)
         x5, x7, x9, x12 = x
         x13 = self.M12(x12)
         x14 = self.M13(x13)
