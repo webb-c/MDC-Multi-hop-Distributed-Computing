@@ -37,8 +37,6 @@ class CameraSender(MDC):
         self._memory = posix_ipc.SharedMemory(self._shared_memory_name, flags=posix_ipc.O_CREAT, mode=0o777, size=int(np.prod(self._shape) * np.dtype(np.uint8).itemsize))
         self._map_file = mmap.mmap(self._memory.fd, self._memory.size)
         # posix_ipc.close_fd(self._memory.fd)
-        
-        self.topic_dispatcher["mdc/arrival_rate"] = self.handle_arrival_rate
 
         self._job_name = job_name
         self._job_info = None
@@ -46,6 +44,8 @@ class CameraSender(MDC):
         self._arrival_rate = 0
 
         super().__init__(sub_config, pub_configs)
+
+        self.topic_dispatcher["mdc/arrival_rate"] = self.handle_arrival_rate
 
     def init_job_info(self):
         source_ip = self._address
