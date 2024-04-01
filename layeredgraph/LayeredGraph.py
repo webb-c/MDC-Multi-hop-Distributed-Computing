@@ -163,6 +163,7 @@ class LayeredGraph:
                                  destination = destination)
             
             arrival_rate += self._layered_graph_backlog[link]
+            print(self._layered_graph_backlog)
 
         return arrival_rate
 
