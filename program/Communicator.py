@@ -1,6 +1,7 @@
 import posix_ipc
 import sys
-import os
+import numpy as np
+import pickle
 
 class Communicator(Exception):
     """OMNeT++와의 통신을 위해 사용합니다.
