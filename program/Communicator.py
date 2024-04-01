@@ -23,7 +23,7 @@ class Communicator(Exception):
         # 직렬화된 데이터 전송
         self.queue.send(msg)
     
-    def receive_numpy_array(self) -> np.ndarray:
+    def get_numpy_array(self) -> np.ndarray:
         # 메시지 수신
         msg, _ = self.queue.receive(self.buffer_size)
         # 직렬화 해제하여 NumPy 배열로 변환
