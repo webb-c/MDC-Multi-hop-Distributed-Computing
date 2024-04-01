@@ -153,5 +153,19 @@ class LayeredGraph:
     def get_layered_graph_backlog(self):
         return self._layered_graph_backlog
     
+    def get_arrival_rate(self, path):
+        arrival_rate = 0
+        for i in range(len(path) - 1):
+            source = path[i]
+            destination = path[i + 1]
+
+            link = LayerNodePair(source = source,
+                                 destination = destination)
+            
+            arrival_rate += self._layered_graph_backlog[link]
+
+        return arrival_rate
+
+    
     
 

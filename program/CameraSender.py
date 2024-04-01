@@ -37,10 +37,13 @@ class CameraSender(MDC):
         self._memory = posix_ipc.SharedMemory(self._shared_memory_name, flags=posix_ipc.O_CREAT, mode=0o777, size=int(np.prod(self._shape) * np.dtype(np.uint8).itemsize))
         self._map_file = mmap.mmap(self._memory.fd, self._memory.size)
         # posix_ipc.close_fd(self._memory.fd)
+        
+        self.topic_dispatcher["mdc/arrival_rate"] = self.handle_arrival_rate
 
         self._job_name = job_name
         self._job_info = None
         self._frame_list = dict()
+        self._arrival_rate = 0
 
         super().__init__(sub_config, pub_configs)
 
@@ -77,6 +80,12 @@ class CameraSender(MDC):
             publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
 
             self._capacity_manager.update_computing_capacity(computing_capacity)
+
+    def handle_arrival_rate(self, topic, data, publisher):
+        arrival_rate = pickle.loads(data)
+
+        self._arrival_rate = arrival_rate
+        print("arrival_rate", arrival_rate)
        
     def stream_player(self):
         c = np.ndarray(self._shape, dtype=np.uint8, buffer=self._map_file)
@@ -94,6 +103,7 @@ class CameraSender(MDC):
         input("Press any key to start sending.")
 
         self.run_camera_streamer()
+        self.run_arrival_rate_getter()
 
         while True:
             sleep_time = self.get_sleep_time()
@@ -142,6 +152,17 @@ class CameraSender(MDC):
             self._frame_list[self._job_info.get_job_id()] = current_frame
 
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
+
+    def arrival_rate_getter(self):
+        node_info_bytes = pickle.dumps(self._node_info)
+        while True:
+            time.sleep(0.1)
+            self._controller_publisher.publish("mdc/arrival_rate", node_info_bytes)
+
+    def run_arrival_rate_getter(self):
+        arrival_rate_thread = Thread(target=self.stream_player, args=())
+        arrival_rate_thread.start()
+
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
@@ -156,6 +177,7 @@ if __name__ == '__main__':
                 ("job/subtask_info", 1),
                 ("mdc/network_info", 1),
                 ("mdc/node_info", 1),
+                ("mdc/arrival_rate", 1),
             ],
         }
     

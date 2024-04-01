@@ -22,6 +22,7 @@ class Controller(Program):
             "mdc/node_info": self.handle_node_info,
             "job/request_scheduling": self.handle_request_scheduling,
             "job/response": self.handle_response,
+            "mdc/arrival_rate": self.handle_request_arrival_rate
         }
 
         self.topic_dispatcher_checker = {}
@@ -32,6 +33,7 @@ class Controller(Program):
         self._backlog_log_path = None
         self._network_info: NetworkInfo = None
         self._layered_graph = None
+        self._arrival_rate = 0
         
         self._job_list = {}
         self._job_list_mutex = threading.Lock()
@@ -133,6 +135,8 @@ class Controller(Program):
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
 
+        self._arrival_rate = self._layered_graph.get_arrival_rate(path)
+
         print("path", path)
         print("id", job_info.get_job_id())
 
@@ -167,6 +171,18 @@ class Controller(Program):
         latency_log_file_path = f"{self._latency_log_path}/{subtask_info.get_job_name()}.csv"
         save_latency(latency_log_file_path, latency)
 
+    def handle_request_arrival_rate(self, topic, payload, publisher):
+        # get source ip address
+        node_info: NodeInfo = pickle.loads(payload)
+        ip = node_info.get_ip()
+
+        arrival_rate_bytes = pickle.dumps(self._arrival_rate)
+
+        # send arrival_rate byte to source ip (response)
+        publish.single("mdc/arrival_rate", arrival_rate_bytes, hostname=ip)
+
+
+
     def start(self):
         while True:
             time.sleep(self._network_info.get_sync_time())
@@ -183,6 +199,7 @@ if __name__ == '__main__':
                 ("job/response", 1),
                 ("mdc/node_info", 1),
                 ("job/request_scheduling", 1),
+                ("mdc/arrival_rate", 1),
             ],
         }
     
