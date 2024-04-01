@@ -31,7 +31,8 @@ TARGET_DEPTH = 3
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
-        self._communicator = Communicator("/frame_drop_rl", 200000, True)
+        self._communicator_sender = Communicator("/frame_drop_rl_jetson_to_agent", 200000, True)
+        self._communicator_receiver = Communicator("/frame_drop_rl_agent_to_jetson", 200000, True)
 
         self._job_name = job_name
         self._job_info = None
@@ -89,8 +90,8 @@ class Sender(MDC):
         self.run_arrival_rate_getter()
 
         while True:
-            self._communicator.send_message("waiting")
-            agent_message = self._communicator.get_message()
+            self._communicator_sender.send_message("waiting")
+            agent_message = self._communicator_receiver.get_message()
 
             if agent_message == "action":
                 self.handle_action()
@@ -146,8 +147,8 @@ class Sender(MDC):
         self.send_frame(frame)
         
     def get_frame(self) -> float:
-        self._communicator.send_message("ACK")
-        frame: np.array = self._communicator.get_numpy_array()
+        self._communicator_sender.send_message("ACK")
+        frame: np.array = self._communicator_receiver.get_numpy_array()
 
         return frame
     
@@ -159,7 +160,7 @@ class Sender(MDC):
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
     
     def handle_reward(self):
-        self._communicator.send_message(str(self._arrival_rate))
+        self._communicator_sender.send_message(str(self._arrival_rate))
 
     
         
