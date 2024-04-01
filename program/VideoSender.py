@@ -38,6 +38,9 @@ class VideoSender(MDC):
 
         super().__init__(sub_config, pub_configs)
 
+        self.topic_dispatcher["mdc/arrival_rate"] = self.handle_arrival_rate
+
+
     def init_job_info(self):
         source_ip = self._address
         terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
@@ -71,7 +74,12 @@ class VideoSender(MDC):
             publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
 
             self._capacity_manager.update_computing_capacity(computing_capacity)
-       
+
+    def handle_arrival_rate(self, topic, data, publisher):
+        arrival_rate = pickle.loads(data)
+
+        self._arrival_rate = arrival_rate
+
     def stream_player(self):
         cap = cv2.VideoCapture("video/JN.mp4")
 
@@ -87,6 +95,7 @@ class VideoSender(MDC):
         input("Press any key to start sending.")
 
         self.run_camera_streamer()
+        self.run_arrival_rate_getter()
 
         while True:
             sleep_time = self.get_sleep_time()
@@ -135,7 +144,17 @@ class VideoSender(MDC):
             self._frame_list[self._job_info.get_job_id()] = current_frame
 
             self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
-        
+    
+    def arrival_rate_getter(self):
+        node_info_bytes = pickle.dumps(self._node_info)
+        while True:
+            time.sleep(0.1)
+            self._controller_publisher.publish("mdc/arrival_rate", node_info_bytes)
+
+    def run_arrival_rate_getter(self):
+        arrival_rate_thread = Thread(target=self.arrival_rate_getter, args=())
+        arrival_rate_thread.start()
+
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
         return 0.5

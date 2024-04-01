@@ -85,7 +85,6 @@ class CameraSender(MDC):
         arrival_rate = pickle.loads(data)
 
         self._arrival_rate = arrival_rate
-        print("arrival_rate", arrival_rate)
        
     def stream_player(self):
         c = np.ndarray(self._shape, dtype=np.uint8, buffer=self._map_file)
@@ -166,7 +165,7 @@ class CameraSender(MDC):
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
-        return 0.1
+        return 0.5
 
 if __name__ == '__main__':
     sub_config = {

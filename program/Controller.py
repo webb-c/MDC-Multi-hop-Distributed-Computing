@@ -137,9 +137,6 @@ class Controller(Program):
 
         self._arrival_rate = self._layered_graph.get_arrival_rate(path)
 
-        print("path", path)
-        print("id", job_info.get_job_id())
-
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
             model_index = 1
         else:
