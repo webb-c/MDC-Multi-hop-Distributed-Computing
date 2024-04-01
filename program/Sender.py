@@ -31,8 +31,8 @@ TARGET_DEPTH = 3
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
-        self._communicator_sender = Communicator("/frame_drop_rl_jetson_to_agent", 200000, True)
-        self._communicator_receiver = Communicator("/frame_drop_rl_agent_to_jetson", 200000, True)
+        self._communicator_sender = Communicator("/frame_drop_rl_jetson_to_agent", 20000000, True)
+        self._communicator_receiver = Communicator("/frame_drop_rl_agent_to_jetson", 20000000, True)
 
         self._job_name = job_name
         self._job_info = None
