@@ -160,7 +160,7 @@ class CameraSender(MDC):
             self._controller_publisher.publish("mdc/arrival_rate", node_info_bytes)
 
     def run_arrival_rate_getter(self):
-        arrival_rate_thread = Thread(target=self.stream_player, args=())
+        arrival_rate_thread = Thread(target=self.arrival_rate_getter, args=())
         arrival_rate_thread.start()
 
         
