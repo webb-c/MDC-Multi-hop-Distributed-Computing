@@ -166,7 +166,7 @@ class CameraSender(MDC):
         
     def get_sleep_time(self) -> float:
         # implement any frame drop logic
-        return 0.5
+        return 0.1
 
 if __name__ == '__main__':
     sub_config = {
