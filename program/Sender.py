@@ -31,7 +31,7 @@ TARGET_DEPTH = 3
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
-        self._communicator = Communicator("//./pipe/frame_drop_rl", 200000, True)
+        self._communicator = Communicator("/pipe/frame_drop_rl", 200000, True)
 
         self._job_name = job_name
         self._job_info = None
