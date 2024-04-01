@@ -50,7 +50,7 @@ class Communicator(Exception):
 
     def init_queue(self, queue_name:str) -> posix_ipc.MessageQueue:
         try:
-            queue = posix_ipc.MessageQueue(queue_name, posix_ipc.O_CREAT)
+            queue = posix_ipc.MessageQueue(queue_name, posix_ipc.O_CREAT, max_message_size=self.buffer_size)
             print(f"Queue {queue_name} successfully created.")
         except posix_ipc.ExistentialError:
             print("Queue already exists, trying to open it.")
