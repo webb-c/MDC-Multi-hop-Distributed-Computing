@@ -85,11 +85,14 @@ class MDC(Program):
 
         if len(links) == 0 and not self._backlogs_zero_flag:
             self._backlogs_zero_flag = True
+
+        elif len(links) == 0 and self._backlogs_zero_flag:
+            return
+        
         elif len(links) != 0:
             self._backlogs_zero_flag = False
 
-        if self._backlogs_zero_flag:
-            return
+        
         
         computing_capacity = self._capacity_manager.get_computing_capacity()
         transfer_capacity = self._capacity_manager.get_transfer_capacity()
