@@ -85,6 +85,7 @@ class MDC(Program):
 
         if len(links) == 0 and not self._backlogs_zero_flag:
             self._backlogs_zero_flag = True
+            return
         elif len(links) != 0:
             self._backlogs_zero_flag = False
         
