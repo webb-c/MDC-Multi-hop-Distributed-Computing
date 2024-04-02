@@ -41,8 +41,6 @@ class Controller(Program):
         self.init_network_info()
         self.init_path()
         self.init_layered_graph()
-        self.init_garbage_job_collector()
-        self.init_record_virtual_backlog()
 
     def init_network_info(self):
         with open("config.json", 'r') as file:
@@ -89,6 +87,22 @@ class Controller(Program):
             backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
             save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
 
+    def init_sync_backlog(self):
+        sync_backlog_thread = threading.Thread(target=self.sync_backlog, args=())
+        sync_backlog_thread.start()
+
+    def sync_backlog(self):
+        while True:
+            time.sleep(self._network_info.get_sync_time())
+            for node_ip in self._network_info.get_network():
+                # send RequestBacklog byte to source ip (response)
+                request_backlog = RequestBacklog()
+                request_backlog_bytes = pickle.dumps(request_backlog)
+                try:
+                    publish.single("mdc/node_info", request_backlog_bytes, hostname=node_ip)
+                except:
+                    pass
+
     def handle_network_info(self, topic, payload, publisher):
         # get source ip address
         node_info: NodeInfo = pickle.loads(payload)
@@ -104,15 +118,7 @@ class Controller(Program):
 
         print(f"Succesfully respond to ip: {ip}.")
 
-    def sync_backlog(self):
-        for node_ip in self._network_info.get_network():
-            # send RequestBacklog byte to source ip (response)
-            request_backlog = RequestBacklog()
-            request_backlog_bytes = pickle.dumps(request_backlog)
-            try:
-                publish.single("mdc/node_info", request_backlog_bytes, hostname=node_ip)
-            except:
-                pass
+
 
     def handle_node_info(self, topic, payload, publisher):
         node_link_info: NodeLinkInfo = pickle.loads(payload)
@@ -178,12 +184,10 @@ class Controller(Program):
         # send arrival_rate byte to source ip (response)
         publish.single("mdc/arrival_rate", arrival_rate_bytes, hostname=ip)
 
-
-
     def start(self):
-        while True:
-            time.sleep(self._network_info.get_sync_time())
-            self.sync_backlog()
+        self.init_garbage_job_collector()
+        self.init_record_virtual_backlog()
+        self.init_sync_backlog()
 
 
 if __name__ == '__main__':
