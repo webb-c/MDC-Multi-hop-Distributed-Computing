@@ -20,7 +20,8 @@ except ImportError:
         return int(now.timestamp() * 1e9)
 
 from utils.utils import get_ip_address
-from program import MDC, Communicator
+from program import MDC
+from program.Communicator import Communicator
 from job import JobInfo, SubtaskInfo, DNNOutput
 
 TARGET_WIDTH = 320
