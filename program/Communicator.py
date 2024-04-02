@@ -1,7 +1,5 @@
 import posix_ipc
 import sys
-import numpy as np
-import pickle
 
 class Communicator(Exception):
     """OMNeT++와의 통신을 위해 사용합니다.
@@ -14,23 +12,6 @@ class Communicator(Exception):
         self.buffer_size = buffer_size
         self.debug_mode = debug_mode
         self.queue = self.init_queue(self.queue_name)
-
-    def send_numpy_array(self, array: np.ndarray):
-        # NumPy 배열을 직렬화
-        msg = pickle.dumps(array)
-        if self.debug_mode:
-            print("Sending array:", array)
-        # 직렬화된 데이터 전송
-        self.queue.send(msg)
-    
-    def get_numpy_array(self) -> np.ndarray:
-        # 메시지 수신
-        msg, _ = self.queue.receive(self.buffer_size)
-        # 직렬화 해제하여 NumPy 배열로 변환
-        array = pickle.loads(msg)
-        if self.debug_mode:
-            print("Received array:", array)
-        return array
 
     def send_message(self, msg:str):
         if self.debug_mode:
