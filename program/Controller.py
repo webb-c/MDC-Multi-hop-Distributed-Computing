@@ -118,8 +118,6 @@ class Controller(Program):
 
         print(f"Succesfully respond to ip: {ip}.")
 
-
-
     def handle_node_info(self, topic, payload, publisher):
         node_link_info: NodeLinkInfo = pickle.loads(payload)
         links = node_link_info.get_links()

@@ -41,6 +41,7 @@ class MDC(Program):
         self._network_info = None
         self._job_manager = None
         self._neighbors = None
+        self._backlogs_zero_flag = False
 
         self._capacity_manager = CapacityManager()
 
@@ -81,8 +82,11 @@ class MDC(Program):
         self._capacity_manager.update_transfer_capacity()
 
         links = self._job_manager.get_backlogs()
-        if len(links) == 0:
-            return
+
+        if len(links) == 0 and not self._backlogs_zero_flag:
+            self._backlogs_zero_flag = True
+        elif len(links) != 0:
+            self._backlogs_zero_flag = False
         
         computing_capacity = self._capacity_manager.get_computing_capacity()
         transfer_capacity = self._capacity_manager.get_transfer_capacity()
