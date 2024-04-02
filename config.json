@@ -3,23 +3,9 @@
     "jobs": {
         "test job 1" : {
             "job_type" : "dnn",
-            "model_name" : "resnet-18",
+            "model_name" : "yolov5",
             "warmup" : "True",
-            "warmup_input" : [1, 3, 32, 32],
-            "split_points" : [
-                [0, 0], 
-                [0, 2],
-                [2, 6],
-                [6, 11]
-            ],
-            "source" : "192.168.1.5",
-            "destination" : "192.168.1.8"
-        },
-        "test job 2" : {
-            "job_type" : "dnn",
-            "model_name" : "resnet-18",
-            "warmup" : "True",
-            "warmup_input" : [1, 3, 32, 32],
+            "warmup_input" : [1, 3, 320, 320],
             "split_points" : [
                 [0, 0], 
                 [0, 2],
