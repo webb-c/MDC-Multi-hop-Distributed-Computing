@@ -148,7 +148,8 @@ class Sender(MDC):
         
     def get_frame(self) -> float:
         self._communicator_sender.send_message("ACK")
-        frame: np.array = self._communicator_receiver.get_numpy_array()
+        frame_shape = eval(self._communicator_receiver.get_message())
+        frame: np.array = np.zeros(frame_shape)
 
         return frame
     
