@@ -51,11 +51,10 @@ class DNNModels:
                 computing_ratios.append(sum(self._yolo_computing_ratios[start: end]))
                 transfer_ratios.append(sum(self._yolo_transfer_ratios[start: end]))
 
+            transfer_ratios[0] = 1.0
+
             self._computing_ratios[job_name] = computing_ratios
             self._transfer_ratios[job_name] = transfer_ratios
-
-            print("computing_ratios", computing_ratios)
-            print("transfer_ratios", transfer_ratios)
 
             with torch.no_grad():
 

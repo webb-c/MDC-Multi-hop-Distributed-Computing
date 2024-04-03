@@ -112,8 +112,7 @@ def load_model(model_name) -> torch.nn.Module:
     assert model_name in available_model_list, f"Model must be in {available_model_list}."
 
     if model_name == "yolov5":
-        identity = torch.nn.Sequential()
-        models = torch.nn.Sequential(identity, P1(), P2(), P3(), P4())
+        models = torch.nn.Sequential(P1(), P2(), P3(), P4())
         return models, None
     
     elif model_name == "resnet-18":
