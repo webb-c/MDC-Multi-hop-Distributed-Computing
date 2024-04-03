@@ -104,6 +104,9 @@ class LayeredGraph:
 
         for layer in range(self._max_layer_depth - 1):
             for source_ip in self._network:
+                if source_ip in self._network_info.get_router():
+                    continue
+                
                 source = LayerNode(source_ip, layer)
                 destination = LayerNode(source_ip, layer + 1)
 

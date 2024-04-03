@@ -6,6 +6,7 @@ class NetworkInfo:
         self._queue_name = self._network_config["queue_name"]
         self._jobs = self._network_config["jobs"]
         self._netowrk = self._network_config["network"]
+        self._router = self._network_config["router"]
         self._scheduling_algorithm: str = self._network_config["scheduling_algorithm"]
         self._sync_time: float = self._network_config["sync_time"]
         self._collect_garbage_job_time: float = self._network_config["collect_garbage_job_time"]
@@ -21,6 +22,9 @@ class NetworkInfo:
     
     def get_network(self):
         return self._netowrk
+    
+    def get_router(self):
+        return self._router
     
     def get_scheduling_algorithm(self):
         return self._scheduling_algorithm
