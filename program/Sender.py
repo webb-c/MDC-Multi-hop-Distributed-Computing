@@ -24,14 +24,14 @@ from program import MDC
 from program.Communicator import Communicator
 from job import JobInfo, SubtaskInfo, DNNOutput
 
-TARGET_WIDTH = 320
-TARGET_HEIGHT = 320
-TARGET_DEPTH = 3
-
 
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
+        self._communicator = Communicator(queue_name="/frame_drop_rl", 
+                                          buffer_size=4096, 
+                                          is_agent=False,
+                                          debug_mode=True)
 
         self._job_name = job_name
         self._job_info = None
@@ -63,7 +63,7 @@ class Sender(MDC):
 
         if subtask_layer_node.get_ip() == self._address and subtask_layer_node.get_layer() == 0:
             job_id = subtask_info.get_job_id()
-            input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]).float().view(1, TARGET_DEPTH, TARGET_HEIGHT, TARGET_WIDTH), subtask_info)
+            input_frame = DNNOutput(torch.tensor(self._frame_list[job_id]).float(), subtask_info)
             dnn_output, computing_capacity = self._job_manager.run(input_frame)
             destination_ip = subtask_info.get_destination().get_ip()
 
@@ -87,7 +87,6 @@ class Sender(MDC):
         input("Press any key to start sending.")
 
         self.run_arrival_rate_getter()
-        self.init_communicator()
 
         while True:
             self._communicator.send_message("waiting")
@@ -141,12 +140,6 @@ class Sender(MDC):
     def run_arrival_rate_getter(self):
         arrival_rate_thread = Thread(target=self.arrival_rate_getter, args=())
         arrival_rate_thread.start()
-
-    def init_communicator(self):
-        self._communicator = Communicator(queue_name=self._network_info.get_queue_name(), 
-                                          buffer_size=4096, 
-                                          is_agent=False,
-                                          debug_mode=True)
 
     def handle_action(self):
         frame = self.get_frame()
