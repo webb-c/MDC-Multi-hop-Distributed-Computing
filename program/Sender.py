@@ -33,7 +33,7 @@ class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
         self._communicator = Communicator(queue_name="/frame_drop_rl", 
-                                          buffer_size=200000, 
+                                          buffer_size=4096, 
                                           is_agent=False,
                                           debug_mode=True)
 
