@@ -79,11 +79,12 @@ class Sender(MDC):
 
     def start(self):
         self.wait_until_can_send()
+        self.init_communicator()
 
         input("Press any key to start sending.")
 
         self.run_arrival_rate_getter()
-        self.init_communicator()
+        
 
         while True:
             self._communicator.send_message("waiting")
