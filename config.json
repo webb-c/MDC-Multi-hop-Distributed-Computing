@@ -1,5 +1,6 @@
 {
     "experiment_name" : "ex1",
+    "queue_name" : "LRLO",
     "jobs": {
         "test job 1" : {
             "job_type" : "dnn",

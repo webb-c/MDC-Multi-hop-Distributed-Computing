@@ -32,10 +32,6 @@ TARGET_DEPTH = 3
 class Sender(MDC):
     def __init__(self, sub_config, pub_configs, job_name):
         self._address = get_ip_address(["eth0", "wlan0"])
-        self._communicator = Communicator(queue_name="/frame_drop_rl", 
-                                          buffer_size=4096, 
-                                          is_agent=False,
-                                          debug_mode=True)
 
         self._job_name = job_name
         self._job_info = None
@@ -91,6 +87,7 @@ class Sender(MDC):
         input("Press any key to start sending.")
 
         self.run_arrival_rate_getter()
+        self.init_communicator()
 
         while True:
             self._communicator.send_message("waiting")
@@ -144,6 +141,12 @@ class Sender(MDC):
     def run_arrival_rate_getter(self):
         arrival_rate_thread = Thread(target=self.arrival_rate_getter, args=())
         arrival_rate_thread.start()
+
+    def init_communicator(self):
+        self._communicator = Communicator(queue_name=self._network_info.get_queue_name(), 
+                                          buffer_size=4096, 
+                                          is_agent=False,
+                                          debug_mode=True)
 
     def handle_action(self):
         frame = self.get_frame()

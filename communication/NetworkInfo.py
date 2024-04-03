@@ -3,6 +3,7 @@ class NetworkInfo:
         self._network_config = network_config
 
         self._experiment_name = self._network_config["experiment_name"]
+        self._queue_name = self._network_config["queue_name"]
         self._jobs = self._network_config["jobs"]
         self._netowrk = self._network_config["network"]
         self._scheduling_algorithm: str = self._network_config["scheduling_algorithm"]
@@ -11,6 +12,9 @@ class NetworkInfo:
 
     def get_experiment_name(self):
         return self._experiment_name
+    
+    def get_queue_name(self):
+        return self._queue_name
 
     def get_jobs(self):
         return self._jobs
