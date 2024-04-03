@@ -82,9 +82,10 @@ class Controller(Program):
         record_virtual_backlog_thread.start()
 
     def record_virtual_backlog(self):
+        backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
         while True:
             time.sleep(0.1)
-            backlog_log_file_path = f"{self._backlog_log_path}/total_backlog.csv"
+            self._layered_graph.update_graph()
             save_virtual_backlog(backlog_log_file_path, self._layered_graph.get_layered_graph_backlog())
 
     def init_sync_backlog(self):
@@ -131,7 +132,6 @@ class Controller(Program):
         self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
     def handle_request_scheduling(self, topic, payload, publisher):
-        self._layered_graph.update_graph()
         job_info: JobInfo = pickle.loads(payload)
 
         # register start time
