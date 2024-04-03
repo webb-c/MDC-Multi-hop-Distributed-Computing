@@ -165,6 +165,7 @@ class Sender(MDC):
     
     def handle_reward(self):
         self._communicator.send_message(str(self._arrival_rate))
+        self._communicator.get_message()
 
     
         
