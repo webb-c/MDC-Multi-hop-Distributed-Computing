@@ -17,6 +17,9 @@ class DNNModels:
         self._computing_ratios: Dict[str, List[float]] = dict()
         self._transfer_ratios : Dict[str, List[float]] = dict()
 
+        self._yolo_computing_ratios = [0, 6.24, 2.02, 1.80, 0.64]
+        self._yolo_transfer_ratios = [1, 1.17, 0.95, 1.17, 0.00008]
+
         self.init_model()
     
     def init_model(self):
@@ -31,24 +34,28 @@ class DNNModels:
         # load whole dnn model
         model_name = job["model_name"]
 
-        if "yolo" not in model_name:
-            model, flatten_index = load_model(model_name)
+        model, flatten_index = load_model(model_name)
 
-            for split_point in job["split_points"]:
-                subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
-                self.append_subtask(job_name, subtask)
-
-        else:
-            models = load_model(model_name)
-
-            for model in models:
-                subtask : torch.nn.Module = model.to(self._device)
-                self.append_subtask(job_name, subtask)
+        for split_point in job["split_points"]:
+            subtask : torch.nn.Module = split_model(model, split_point, flatten_index).to(self._device)
+            self.append_subtask(job_name, subtask)
+            
         
     def add_computing_and_transfer(self, job_name: str, job: Dict):
         if "yolo" in job["model_name"]:
-            self._computing_ratios[job_name] = [0, 100, 100, 100, 100] # TODO change to real value
-            self._transfer_ratios[job_name] = [1, 10, 10, 10, 1]
+            computing_ratios = []
+            transfer_ratios = []
+
+            for split_point in job["split_points"]:
+                start, end = split_point
+                computing_ratios.append(sum(self._yolo_computing_ratios[start: end]))
+                transfer_ratios.append(sum(self._yolo_transfer_ratios[start: end]))
+
+            self._computing_ratios[job_name] = computing_ratios
+            self._transfer_ratios[job_name] = transfer_ratios
+
+            print("computing_ratios", computing_ratios)
+            print("transfer_ratios", transfer_ratios)
 
             with torch.no_grad():
 

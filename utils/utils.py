@@ -113,8 +113,8 @@ def load_model(model_name) -> torch.nn.Module:
 
     if model_name == "yolov5":
         identity = torch.nn.Sequential()
-        models = [identity, P1(), P2(), P3(), P4()]
-        return models
+        models = torch.nn.Sequential([identity, P1(), P2(), P3(), P4()])
+        return models, None
     
     elif model_name == "resnet-18":
         model = resnet18(pretrained=True)
