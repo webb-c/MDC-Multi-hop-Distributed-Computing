@@ -169,7 +169,8 @@ class Sender(MDC):
         self._communicator.get_message()
 
     def handle_finish(self):
-        self._controller_publisher.publish("mdc/finish", b"")
+        job_info_bytes = pickle.dumps(self._job_info)
+        self._controller_publisher.publish("mdc/finish", job_info_bytes)
 
     
         

@@ -43,6 +43,8 @@ class Controller(Program):
 
         self._is_first_scheduling = True
 
+        self._last_job_id = None
+
         self.init_network_info()
         self.init_path()
         self.init_layered_graph()
@@ -187,6 +189,11 @@ class Controller(Program):
         latency_log_file_path = f"{self._latency_log_path}/{subtask_info.get_job_name()}.csv"
         save_latency(latency_log_file_path, latency)
 
+        if subtask_info.get_job_id() == self._last_job_id:
+            print("finish!! exit program.")
+            time.sleep(5)
+            os._exit(1)
+
     def handle_request_arrival_rate(self, topic, payload, publisher):
         # get source ip address
         node_info: NodeInfo = pickle.loads(payload)
@@ -198,9 +205,9 @@ class Controller(Program):
         publish.single("mdc/arrival_rate", arrival_rate_bytes, hostname=ip)
 
     def handle_finish(self, topic, payload, publisher):
-        time.sleep(10)
-        print("finish!! exit program.")
-        os._exit(1)
+        job_info: JobInfo = pickle.loads(payload)
+
+        self._last_job_id = job_info.get_job_id()
 
     def start(self):
         self.init_garbage_job_collector()
