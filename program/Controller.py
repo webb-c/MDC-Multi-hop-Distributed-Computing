@@ -199,7 +199,8 @@ class Controller(Program):
 
     def handle_finish(self, topic, payload, publisher):
         time.sleep(10)
-        exit()
+        print("finish!! exit program.")
+        os._exit(1)
 
     def start(self):
         self.init_garbage_job_collector()
