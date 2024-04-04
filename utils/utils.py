@@ -80,6 +80,7 @@ def save_path(file_path, path):
     # 파일이 존재하는지 확인
     file_exists = os.path.exists(file_path)
 
+    path = [node.to_string() for node in path]
     path_string = ''.join(path)
 
     # 파일에 데이터 쓰기
