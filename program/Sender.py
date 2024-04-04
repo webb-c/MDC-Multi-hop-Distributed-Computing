@@ -143,7 +143,7 @@ class Sender(MDC):
         self._communicator = Communicator(queue_name=self._network_info.get_queue_name(), 
                                           buffer_size=4096, 
                                           is_agent=False,
-                                          debug_mode=True)
+                                          debug_mode=False)
 
     def handle_action(self):
         frame = self.get_frame()
