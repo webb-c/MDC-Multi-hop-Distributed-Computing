@@ -11,7 +11,7 @@ from utils import save_latency, save_virtual_backlog, save_path
 import pickle, json
 import paho.mqtt.publish as publish
 import threading
-import datetime
+from datetime import datetime
 
 class Controller(Program):
     def __init__(self, sub_config, pub_configs):
