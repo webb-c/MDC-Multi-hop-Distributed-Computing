@@ -11,6 +11,7 @@ from utils import save_latency, save_virtual_backlog, save_path
 import pickle, json
 import paho.mqtt.publish as publish
 import threading
+import datetime
 
 class Controller(Program):
     def __init__(self, sub_config, pub_configs):
@@ -51,13 +52,14 @@ class Controller(Program):
             self._network_info = netork_info
 
     def init_path(self):
-        self._latency_log_path = f"./results/{self._network_info.get_experiment_name()}/latency"
+        folder_name = self._network_info.get_experiment_name() + "_" + datetime.now().strftime('%m-%d_%H%M%S')
+        self._latency_log_path = f"./results/{folder_name}/latency"
         os.makedirs(self._latency_log_path, exist_ok=True)
 
-        self._backlog_log_path = f"./results/{self._network_info.get_experiment_name()}/backlog"
+        self._backlog_log_path = f"./results/{folder_name}/backlog"
         os.makedirs(self._backlog_log_path, exist_ok=True)
 
-        self._path_log_path = f"./results/{self._network_info.get_experiment_name()}/path"
+        self._path_log_path = f"./results/{folder_name}/path"
         os.makedirs(self._path_log_path, exist_ok=True)
         
     def init_layered_graph(self):
