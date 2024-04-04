@@ -26,7 +26,8 @@ class Dijkstra:
                 break
 
             # For each neighbor of the current node
-            neighbors = random.shuffle(layered_graph[current_node])
+            neighbors = layered_graph[current_node][:]
+            random.shuffle(neighbors)
             for neighbor in neighbors:
                 neighbor_pair = LayerNodePair(current_node, neighbor)
                 neighbor_pair_str = neighbor_pair
