@@ -98,7 +98,7 @@ class Sender(MDC):
                 self.handle_reward()
 
             elif agent_message == "finish":
-                self.handle_finish()
+                self.handle_finish_from_agent()
 
     def set_job_info_time(self):
         if self._network_info == None:
@@ -168,7 +168,7 @@ class Sender(MDC):
         self._communicator.send_message(str(self._arrival_rate))
         self._communicator.get_message()
 
-    def handle_finish(self):
+    def handle_finish_from_agent(self):
         job_info_bytes = pickle.dumps(self._job_info)
         self._controller_publisher.publish("mdc/finish", job_info_bytes)
 

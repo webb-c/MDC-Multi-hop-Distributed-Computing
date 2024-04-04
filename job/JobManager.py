@@ -21,7 +21,7 @@ except ImportError:
 class JobManager:
     def __init__(self, address, network_info: NetworkInfo):
         # TODO
-        if address != "192.168.1.5":
+        if address != "192.168.1.5" and address != "192.168.1.6":
             self._device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             self._device = "cpu"
