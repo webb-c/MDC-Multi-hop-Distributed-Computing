@@ -3,6 +3,8 @@ from typing import Dict, List
 
 from layeredgraph import LayerNode, LayerNodePair
 
+import random
+
 class Dijkstra:
     def __init__(self):
         pass
@@ -24,7 +26,8 @@ class Dijkstra:
                 break
 
             # For each neighbor of the current node
-            for neighbor in layered_graph[current_node]:
+            neighbors = random.shuffle(layered_graph[current_node])
+            for neighbor in neighbors:
                 neighbor_pair = LayerNodePair(current_node, neighbor)
                 neighbor_pair_str = neighbor_pair
 

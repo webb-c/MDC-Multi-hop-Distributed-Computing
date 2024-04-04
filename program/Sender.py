@@ -185,6 +185,7 @@ if __name__ == '__main__':
                 ("mdc/network_info", 1),
                 ("mdc/node_info", 1),
                 ("mdc/arrival_rate", 1),
+                ("mdc/finish", 1),
             ],
         }
     
