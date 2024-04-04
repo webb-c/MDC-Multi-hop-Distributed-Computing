@@ -6,7 +6,7 @@ from program import Program
 from communication import *
 from layeredgraph import LayeredGraph, LayerNode
 from job import JobInfo, SubtaskInfo
-from utils import save_latency, save_virtual_backlog
+from utils import save_latency, save_virtual_backlog, save_path
 
 import pickle, json
 import paho.mqtt.publish as publish
@@ -141,13 +141,14 @@ class Controller(Program):
         if self._is_first_scheduling:
             self.init_record_virtual_backlog()
             self._is_first_scheduling = False
-            
+
         job_info: JobInfo = pickle.loads(payload)
 
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
+        save_path(path)
 
         self._arrival_rate = self._layered_graph.get_arrival_rate(path)
 
