@@ -29,6 +29,7 @@ class MDC(Program):
             "job/subtask_info": self.handle_subtask_info,
             "mdc/network_info" : self.handle_network_info,
             "mdc/node_info": self.handle_request_backlog,
+            "mdc/finish": self.handle_finish
         }
 
         self.topic_dispatcher_checker = {
@@ -127,6 +128,11 @@ class MDC(Program):
         previous_dnn_output: DNNOutput = pickle.loads(data)
         self.run_dnn(previous_dnn_output)
 
+    def handle_finish(self, topic, data, publisher):
+        print("finish!! exit program.")
+        time.sleep(5)
+        os._exit(1)
+
     def run_dnn(self, previous_dnn_output: DNNOutput):
         # terminal node
         if previous_dnn_output.is_terminal_destination(self._address) and not self._job_manager.is_subtask_exists(previous_dnn_output): 
@@ -164,6 +170,7 @@ if __name__ == '__main__':
                 ("job/subtask_info", 1),
                 ("mdc/network_info", 1),
                 ("mdc/node_info", 1),
+                ("mdc/finish", 1),
             ],
         }
     

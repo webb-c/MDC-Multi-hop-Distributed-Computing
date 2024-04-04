@@ -190,9 +190,18 @@ class Controller(Program):
         save_latency(latency_log_file_path, latency)
 
         if subtask_info.get_job_id() == self._last_job_id:
+            self.notify_finish()
             print("finish!! exit program.")
             time.sleep(5)
             os._exit(1)
+
+    def notify_finish(self):
+        for node_ip in self._network_info.get_network():
+            # send finish to nodes
+            try:
+                publish.single("mdc/finish", b"", hostname=node_ip)
+            except:
+                pass
 
     def handle_request_arrival_rate(self, topic, payload, publisher):
         # get source ip address
