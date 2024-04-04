@@ -148,7 +148,8 @@ class Controller(Program):
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
-        save_path(self._path_log_path, path)
+        path_log_file_path = f"{self._path_log_path}/path.csv"
+        save_path(path_log_file_path, path)
 
         self._arrival_rate = self._layered_graph.get_arrival_rate(path)
 
