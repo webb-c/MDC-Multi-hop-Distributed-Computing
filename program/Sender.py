@@ -98,7 +98,7 @@ class Sender(MDC):
                 self.handle_reward()
 
             elif agent_message == "finish":
-                time.sleep(10)
+                self.handle_finish()
 
     def set_job_info_time(self):
         if self._network_info == None:
@@ -167,6 +167,9 @@ class Sender(MDC):
     def handle_reward(self):
         self._communicator.send_message(str(self._arrival_rate))
         self._communicator.get_message()
+
+    def handle_finish(self):
+        self._controller_publisher.publish("mdc/finish", b"")
 
     
         

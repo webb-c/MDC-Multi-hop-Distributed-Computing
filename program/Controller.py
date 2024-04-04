@@ -23,7 +23,8 @@ class Controller(Program):
             "mdc/node_info": self.handle_node_info,
             "job/request_scheduling": self.handle_request_scheduling,
             "job/response": self.handle_response,
-            "mdc/arrival_rate": self.handle_request_arrival_rate
+            "mdc/arrival_rate": self.handle_request_arrival_rate,
+            "mdc/finish": self.handle_finish,
         }
 
         self.topic_dispatcher_checker = {}
@@ -196,6 +197,10 @@ class Controller(Program):
         # send arrival_rate byte to source ip (response)
         publish.single("mdc/arrival_rate", arrival_rate_bytes, hostname=ip)
 
+    def handle_finish(self, topic, payload, publisher):
+        time.sleep(10)
+        exit()
+
     def start(self):
         self.init_garbage_job_collector()
         self.init_sync_backlog()
@@ -212,6 +217,7 @@ if __name__ == '__main__':
                 ("mdc/node_info", 1),
                 ("job/request_scheduling", 1),
                 ("mdc/arrival_rate", 1),
+                ("mdc/finish", 1)
             ],
         }
     
