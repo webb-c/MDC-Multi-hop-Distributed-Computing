@@ -81,7 +81,7 @@ def save_path(file_path, path):
     file_exists = os.path.exists(file_path)
 
     path = [node.to_string() for node in path]
-    path_string = ''.join(path)
+    path_string = ','.join(path)
 
     # 파일에 데이터 쓰기
     with open(file_path, 'a', newline='') as csvfile:
