@@ -31,12 +31,15 @@ class Controller(Program):
 
         self._latency_log_path = None
         self._backlog_log_path = None
+        self._path_log_path = None
         self._network_info: NetworkInfo = None
         self._layered_graph = None
         self._arrival_rate = 0
         
         self._job_list = {}
         self._job_list_mutex = threading.Lock()
+
+        self._is_first_scheduling = True
 
         self.init_network_info()
         self.init_path()
@@ -53,6 +56,9 @@ class Controller(Program):
 
         self._backlog_log_path = f"./results/{self._network_info.get_experiment_name()}/backlog"
         os.makedirs(self._backlog_log_path, exist_ok=True)
+
+        self._path_log_path = f"./results/{self._network_info.get_experiment_name()}/path"
+        os.makedirs(self._path_log_path, exist_ok=True)
         
     def init_layered_graph(self):
         self._layered_graph = LayeredGraph(self._network_info)
@@ -132,6 +138,10 @@ class Controller(Program):
         self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
     def handle_request_scheduling(self, topic, payload, publisher):
+        if self._is_first_scheduling:
+            self.init_record_virtual_backlog()
+            self._is_first_scheduling = False
+            
         job_info: JobInfo = pickle.loads(payload)
 
         # register start time
@@ -184,7 +194,6 @@ class Controller(Program):
 
     def start(self):
         self.init_garbage_job_collector()
-        self.init_record_virtual_backlog()
         self.init_sync_backlog()
 
 

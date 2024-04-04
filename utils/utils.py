@@ -76,27 +76,23 @@ def save_virtual_backlog(file_path, virtual_backlog):
 
         writer.writerow(datas)
 
+def save_path(file_path, path):
+    # 파일이 존재하는지 확인
+    file_exists = os.path.exists(file_path)
 
-# def split_model(model, split_point) -> torch.nn.Module:
-#     current_idx = 0
-#     layers = []
-#     start_index, end_index = split_point
+    path_string = ''.join(path)
 
-#     def _recursive_add_layers(module):
-#         nonlocal current_idx
-#         for child in module.children():
-#             if len(list(child.children())) == 0 : 
-#                 if start_index <= current_idx < end_index:
-#                     layers.append(child)
-#                 current_idx += 1
-#             else: 
-#                 _recursive_add_layers(child)            
-#         return
-
-#     _recursive_add_layers(model)
-#     splited_model = torch.nn.Sequential(*layers)
-#     return splited_model
+    # 파일에 데이터 쓰기
+    with open(file_path, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
         
+        # 파일이 새로 만들어진 경우 열 이름을 씁니다.
+        if not file_exists:
+            writer.writerow(["path"])
+        
+        # 데이터 행을 파일에 씁니다.
+        writer.writerow([path_string])
+       
 def split_model(model: torch.nn.Module, split_point, flatten_index: int) -> torch.nn.Module:
     start, end = split_point
     layers = list(model.children())
