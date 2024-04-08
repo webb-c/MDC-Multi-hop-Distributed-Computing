@@ -166,11 +166,11 @@ if __name__ == '__main__':
             "ip": "127.0.0.1", 
             "port": 1883,
             "topics": [
-                ("job/dnn", 0),
-                ("job/subtask_info", 0),
-                ("mdc/network_info", 0),
-                ("mdc/node_info", 0),
-                ("mdc/finish", 0),
+                ("job/dnn", 1),
+                ("job/subtask_info", 1),
+                ("mdc/network_info", 1),
+                ("mdc/node_info", 1),
+                ("mdc/finish", 1),
             ],
         }
     
