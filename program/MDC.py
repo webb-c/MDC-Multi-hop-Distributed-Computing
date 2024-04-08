@@ -23,6 +23,7 @@ class MDC(Program):
             "ip" : "192.168.1.2",
             "port" : 1883
         })
+        self._node_publisher = {}
 
         self.topic_dispatcher = {
             "job/dnn": self.handle_dnn,
@@ -75,7 +76,21 @@ class MDC(Program):
         self._network_info: NetworkInfo = pickle.loads(data)
         self._job_manager = JobManager(self._address, self._network_info)
 
+        self.init_node_publisher()
+
         print(f"Succesfully get network info.")
+
+
+    def init_node_publisher(self):
+        network = self._network_info.get_network()
+        neighbors = network[self._address]
+
+        for neighbor in neighbors:
+            publisher = MQTTclient.Publisher(config={
+                "ip" : neighbor,
+                "port" : 1883
+            })
+            self._node_publisher[neighbor] = publisher
 
 
     def handle_request_backlog(self, topic, data, publisher):
