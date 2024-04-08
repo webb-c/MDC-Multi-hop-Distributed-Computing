@@ -38,13 +38,13 @@ class Sender(MDC):
 
         self.topic_dispatcher["mdc/arrival_rate"] = self.handle_arrival_rate
 
-    def init_job_info(self):
+    def init_job_info(self, input_size: int):
         source_ip = self._address
         terminal_destination = self._network_info.get_jobs()[self._job_name]["destination"]
         job_type = self._network_info.get_jobs()[self._job_name]["job_type"]
         job_name = self._job_name
         start_time = time_ns()
-        input_size = None # should be initiailzed
+        input_size = input_size 
 
         job_info = JobInfo(source_ip, terminal_destination, job_type, job_name, start_time, input_size)
 
@@ -69,7 +69,6 @@ class Sender(MDC):
             dnn_output_bytes = pickle.dumps(dnn_output)
                 
             # send job to next node
-            # publish.single(f"job/{subtask_info.get_job_type()}", dnn_output_bytes, hostname=destination_ip)
             self._node_publisher[destination_ip].publish(f"job/{subtask_info.get_job_type()}", dnn_output_bytes)
 
             self._capacity_manager.update_computing_capacity(computing_capacity)
@@ -159,11 +158,15 @@ class Sender(MDC):
         return frame
     
     def send_frame(self, frame):
-        if self.set_job_info_time() and self.set_job_info_input_size(frame):
-            job_info_bytes = pickle.dumps(self._job_info)
-            self._frame_list[self._job_info.get_job_id()] = frame
+        if self._job_info == None:
+            input_size = sys.getsizeof(torch.tensor(frame).storage())
+            self.init_job_info(input_size)
 
-            self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
+        self.set_job_info_time()
+        job_info_bytes = pickle.dumps(self._job_info)
+        self._frame_list[self._job_info.get_job_id()] = frame
+
+        self._controller_publisher.publish("job/request_scheduling", job_info_bytes)
     
     def handle_reward(self):
         self._communicator.send_message(str(self._arrival_rate))
