@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 from communication import NetworkInfo
 from layeredgraph import LayerNode, LayerNodePair
@@ -40,6 +40,29 @@ class LayeredGraph:
                 self._capacity[source_ip][destination_ip] = computing_capacity
             else:
                 self._capacity[source_ip][destination_ip] = transfer_capacity
+    
+    def update_path_backlog(self, job_info: JobInfo, path: List[LayerNode]):
+        input_size = job_info.get_input_size()
+        model_index = 0
+
+        if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
+            model_index = 1
+        else:
+            model_index = 0
+        
+        for i in range(len(path) - 1):
+            source_layer_node: LayerNode = path[i]
+            destination_layer_node: LayerNode = path[i + 1]
+            link = LayerNodePair(source_layer_node, destination_layer_node)
+
+            if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
+                model_index += 1
+
+            if source_layer_node.is_same_node(destination_layer_node):
+                self._layered_graph_backlog[link] += self._yolo_computing_ratios[model_index] * input_size
+
+            elif source_layer_node.is_same_layer(destination_layer_node):
+                self._layered_graph_backlog[link] += self._yolo_transfer_ratios[model_index] * input_size
         
     def update_graph(self):
         current_time = time.time()
@@ -135,28 +158,6 @@ class LayeredGraph:
         source_node = LayerNode(source_ip, 0)
         destination_node = LayerNode(job_info.get_terminal_destination(), split_num - 1)
         path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
-
-        input_size = job_info.get_input_size()
-        model_index = 0
-
-        if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
-            model_index = 1
-        else:
-            model_index = 0
-        
-        for i in range(len(path) - 1):
-            source_layer_node: LayerNode = path[i]
-            destination_layer_node: LayerNode = path[i + 1]
-            link = LayerNodePair(source_layer_node, destination_layer_node)
-
-            if i != 0 and source_layer_node.is_same_node(destination_layer_node) and not source_layer_node.is_same_layer(destination_layer_node):
-                model_index += 1
-
-            if source_layer_node.is_same_node(destination_layer_node):
-                self._layered_graph_backlog[link] += self._yolo_computing_ratios[model_index] * input_size
-
-            elif source_layer_node.is_same_layer(destination_layer_node):
-                self._layered_graph_backlog[link] += self._yolo_transfer_ratios[model_index] * input_size
 
         return path
     

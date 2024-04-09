@@ -156,9 +156,9 @@ class Controller(Program):
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
 
-        self._arrival_rate = self._layered_graph.get_arrival_rate(path)
-
         path = self._layered_graph.schedule(job_info.get_source_ip(), job_info)
+        self._arrival_rate = self._layered_graph.get_arrival_rate(path)
+        self._layered_graph.update_path_backlog(job_info=job_info, path=path)
         path_log_file_path = f"{self._path_log_path}/path.csv"
         save_path(path_log_file_path, path)
 
