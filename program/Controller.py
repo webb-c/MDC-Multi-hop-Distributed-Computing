@@ -45,6 +45,8 @@ class Controller(Program):
 
         self._last_job_id = None
 
+        self._job_info_dummy = None
+
         self.init_network_info()
         self.init_path()
         self.init_layered_graph()
@@ -146,12 +148,18 @@ class Controller(Program):
         self._layered_graph.set_graph(links)
         self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
+        path = self._layered_graph.schedule(self._job_info_dummy.get_source_ip(), self._job_info_dummy)
+        self._arrival_rate = self._layered_graph.get_arrival_rate(path)
+
     def handle_request_scheduling(self, topic, payload, publisher):
+        job_info: JobInfo = pickle.loads(payload)
+
         if self._is_first_scheduling:
             self.init_record_virtual_backlog()
             self._is_first_scheduling = False
+            self._job_info_dummy = job_info
 
-        job_info: JobInfo = pickle.loads(payload)
+        
 
         # register start time
         self._job_list[job_info.get_job_id()] = time.time_ns()
