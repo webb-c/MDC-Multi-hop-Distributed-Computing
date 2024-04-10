@@ -148,8 +148,9 @@ class Controller(Program):
         self._layered_graph.set_graph(links)
         self._layered_graph.set_capacity(node_link_info.get_ip(), node_link_info.get_computing_capacity(), node_link_info.get_transfer_capacity())
 
-        path = self._layered_graph.schedule(self._job_info_dummy.get_source_ip(), self._job_info_dummy)
-        self._arrival_rate = self._layered_graph.get_arrival_rate(path)
+        if self._job_info_dummy != None:
+            path = self._layered_graph.schedule(self._job_info_dummy.get_source_ip(), self._job_info_dummy)
+            self._arrival_rate = self._layered_graph.get_arrival_rate(path)
 
     def handle_request_scheduling(self, topic, payload, publisher):
         job_info: JobInfo = pickle.loads(payload)
