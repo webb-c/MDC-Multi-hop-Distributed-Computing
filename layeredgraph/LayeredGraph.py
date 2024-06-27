@@ -3,6 +3,7 @@ from typing import Dict, List
 from communication import NetworkInfo
 from layeredgraph import LayerNode, LayerNodePair
 from job import JobInfo
+from job.DNNModels import DNNModels
 from scheduling import Dijkstra
 
 import importlib
@@ -20,10 +21,9 @@ class LayeredGraph:
         self._previous_update_time = time.time()
         self._capacity = dict()
 
-        self._yolo_computing_ratios = [0, 6.24, 2.02, 1.80, 0.64]
-        self._yolo_transfer_ratios = [1, 1.17, 0.95, 1.17, 0.00008]
-
         self._max_layer_depth = 0
+
+        self._dnn_models = DNNModels(self._network_info, "cpu")
 
         self.init_graph()
         self.init_algorithm()
@@ -43,6 +43,7 @@ class LayeredGraph:
     
     def update_path_backlog(self, job_info: JobInfo, path: List[LayerNode]):
         input_size = job_info.get_input_size()
+        job_name = job_info.get_job_name()
         model_index = 0
 
         if path[0].is_same_node(path[1]) and not path[0].is_same_layer(path[1]):
@@ -59,10 +60,10 @@ class LayeredGraph:
                 model_index += 1
 
             if source_layer_node.is_same_node(destination_layer_node):
-                self._layered_graph_backlog[link] += self._yolo_computing_ratios[model_index] * input_size
+                self._layered_graph_backlog[link] += self._dnn_models.get_computing(job_name, model_index) * input_size
 
             elif source_layer_node.is_same_layer(destination_layer_node):
-                self._layered_graph_backlog[link] += self._yolo_transfer_ratios[model_index] * input_size
+                self._layered_graph_backlog[link] += self._dnn_models.get_transfer(job_name, model_index) * input_size
         
     def update_graph(self):
         current_time = time.time()
