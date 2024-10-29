@@ -29,9 +29,11 @@ class LayeredGraph:
         self._alpha = 0.5
         self._expected_arrival_rate = 0
 
+        self._configs = None
         self.init_graph()
         self.init_algorithm()
         self.init_network_performance_info()
+        
 
     def set_graph(self, links):
         self._previous_update_time = time.time()
@@ -175,6 +177,10 @@ class LayeredGraph:
             path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes, self._dnn_models._yolo_computing_ratios, self._dnn_models._yolo_transfer_ratios, self._expected_arrival_rate, self._network_performance_info, input_size)
         
         elif self._algorithm_class == 'TLDOC':
+            if self._configs is None:
+                #TODO: 저장된 self._config = (time_config, energy_config) 가져오는 코드 (마음대로 고쳐도 됨)
+                idle_power = self.load_config()
+            self._scheduling_algorithm.init_parameter(self._configs[0], self._configs[1], idle_power, self._dnn_models.transfer_ratios)
             path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
         
         else:
@@ -237,3 +243,9 @@ class LayeredGraph:
         """
         # self._network_performance_info[0] -= 
         pass
+    
+    
+    def load_config(self, path):
+        """TODO: path에 있는 파일에서 저장된 config value를 (layer별 time, energy) 불러와서 self._configs에 저장하고 power는 반환한다."""
+        pass 
+        return 

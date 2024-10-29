@@ -4,30 +4,49 @@ from typing import Dict, List
 from layeredgraph import LayerNode, LayerNodePair
 import numpy as np
 import random, math
-from latencymodel.TLDOC import cal_total_latency
+from latencymodel.TLDOC import cal_total_latency, cal_total_latency_except_end
 
 class TLDOC:
-    def __init__(self, scale=0.1, V=1.0, user_preference=0.1):
+    def __init__(self):
+        pass
+    
+    def init_parameter(self, time_config, energy_config, idle_power, transfer_ratios, scale=0.1, V=1.0, latency_allowed=0.5, default_rate=0.1):
+        """ TODO: 형태
+        time_config = {'end': List[각 레이어의 실행시간], 'edge': List[각 레이어의 실행시간], 'cloud': List[각 레이어의 실행시간]}
+        energy_config = {'end': List[각 레이어의 소모에너지], 'end_to_edge': List[각 레이어 output을 end -> edge로 전송할 때 소모에너지]}
+        """
         self._scale = scale
         self._V = V
-        self._user_preference = user_preference
+        self._latency_allowed = latency_allowed
+        self._default_rate = default_rate
         self._epoch = 10
+        self._queue = 0
+        self._time_config = time_config
+        self._energy_config = energy_config 
+        self._idle_power = idle_power       #가능?
+        self._transfer_ratios = transfer_ratios
 
-    def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, layered_graph_backlog, layer_nodes, computing_ratios, transfer_ratios, arrival_rate, network_info, input_size):
+    def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, arrival_rate, network_info, input_size):
         #! index 확인 
+        # input_size * transfer_ratios
+        # end_transfer = network_info[1]['end']
+        # edge_transfer = network_info[1]['edge']
+        data_size_list = [ input_size * arrival_rate * ratio for ratio in self._transfer_ratios ]
         max_layer = len(destination_node)
-        off_tensor = self._lp_offloading(max_layer, network_info)
+        off_tensor = self._lp_offloading(max_layer, network_info, data_size_list)
         partition_point_1, partition_point_2 = off_tensor[0], off_tensor[0]+off_tensor[1]
         path = self._make_path(source_node, destination_node, layered_graph, partition_point_1, partition_point_2)
         return path
     
     
-    def _lp_offloading(self, max_layer, network_info):
+    def _lp_offloading(self, max_layer, network_info, data_size_list):
         off_tensor = self._create_init_tensor(max_layer)
         count = 0
         for i in range(self._epoch):
             temp_off_tensor = self._create_new_off_tensor(off_tensor, network_info)
-            delta = self._objective(temp_off_tensor) - self._objective(off_tensor)
+            temp_cost, _ = self._objective(temp_off_tensor, network_info, data_size_list)
+            cost, _ = self._objective(off_tensor, network_info, data_size_list)
+            delta = temp_cost - cost
             if delta < 0:
                 off_tensor = temp_off_tensor
             else:
@@ -36,6 +55,8 @@ class TLDOC:
             if count >= 2:
                 break
         
+        _, actual_rate = self._objective(off_tensor, network_info, data_size_list)
+        self._queue = self._cal_queue(actual_rate)
         return off_tensor
 
 
@@ -56,8 +77,18 @@ class TLDOC:
         return new_off_tensor
     
     
-    def _objective(self):
-        pass
+    def _objective(self, off_tensor, network_info, data_size_list):
+        actual_rate = self._get_violation_rate(off_tensor, network_info, data_size_list)
+        total_energy = self._cal_total_energy(off_tensor, network_info, data_size_list)
+        temp_queue = self._cal_queue(actual_rate)
+        cost = self._V * temp_queue * actual_rate + total_energy
+        return cost, actual_rate       
+    
+    
+    def _cal_queue(self, actual_rate):
+        new_queue = max(self._queue - self._default_rate, 0) + actual_rate
+        return new_queue
+    
     
     def _create_init_tensor(self, max_layer):
         A_end, A_edge, A_cloud = max_layer, 0, 0 
@@ -65,22 +96,21 @@ class TLDOC:
         return off_tensor
     
     
-    def _make_requirement(self, computing_ratios, transfer_ratios, partition_point, input_size, arrival_rate):
-        """!TODO: requirements 계산방식 확인 (transfer 다 곱셈이 아니라 그냥 그 위치 하나만 곱셈맞는지, arrival rate 어떻게 할건지 확인 필요
-        """
-        computing_requirements = {
-            'end': 0,
-            'edge': arrival_rate * sum(computing_ratios[:partition_point]),
-            'cloud': arrival_rate * sum(computing_ratios[partition_point:])
-        }
-        #! check
-        transfer_requirements = {
-            'end': input_size * arrival_rate,
-            'edge': input_size * arrival_rate * transfer_ratios[partition_point], 
-            'cloud': 0
-        }
+    def _get_violation_rate(self, off_tensor, network_info, data_size_list):
+        actual_rate = 0
+        total_latency = cal_total_latency(off_tensor, self._time_config, network_info, data_size_list)
+        if total_latency > self._latency_allowed:  
+            actual_rate = ((total_latency - self._latency_allowed)/self._latency_allowed)*100
+        return actual_rate
+    
+    
+    def _cal_total_energy(self, off_tensor, network_info, data_size_list):
+        E_cal = sum(self._energy_config['end'][:off_tensor[0]])
+        E_comm = self._energy_config['end_to_edge'][off_tensor[0]]
+        E_idle = cal_total_latency_except_end(off_tensor, self._time_config, network_info, data_size_list) * self._idle_power
         
-        return (computing_requirements, transfer_requirements)
+        total_energy = E_cal + E_comm + E_idle
+        return total_energy
     
     
     def _make_path(self, source_node, destination_node, layered_graph, partition_point_1, partition_point_2):
