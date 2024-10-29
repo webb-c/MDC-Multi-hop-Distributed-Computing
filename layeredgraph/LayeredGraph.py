@@ -178,10 +178,11 @@ class LayeredGraph:
         
         elif self._algorithm_class == 'TLDOC':
             if self._configs is None:
-                #TODO: 저장된 self._config = (time_config, energy_config) 가져오는 코드 (마음대로 고쳐도 됨)
                 idle_power = self.load_config()
+            self.update_expected_arrival_rate()         #!check: TLDOC에서도 expected rate를 쓸 것인지, 진짜 값을 사용할 것인지
+            self.update_network_performance_info()
             self._scheduling_algorithm.init_parameter(self._configs[0], self._configs[1], idle_power, self._dnn_models.transfer_ratios)
-            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
+            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._expected_arrival_rate, self._network_performance_info, input_size)
         
         else:
             path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
@@ -208,7 +209,7 @@ class LayeredGraph:
     def get_layered_graph_backlog(self):
         return self._layered_graph_backlog
     
-    def get_arrival_rate(self, path):
+    def get_arrival_rate(self,path):
         arrival_rate = 0
         for i in range(len(path) - 1):
             source = path[i]
@@ -219,6 +220,7 @@ class LayeredGraph:
             arrival_rate += self._layered_graph_backlog[link]
 
         return arrival_rate
+
 
     def update_expected_arrival_rate(self):
         """TODO: 이번 time slot에 들어온 job rate(slot_arrival_rate)(i.e., 강화학습이 처리한 프레임의 개수)를 기반으로 arrival rate를 계산한다.
@@ -239,13 +241,12 @@ class LayeredGraph:
         
         
     def update_network_performance_info(self):
-        """TODO: 현재 time slot에서 각 (end), edge, cloud에 대해서 idle computing resource를 self._network_performance_info에 저장한다.
-        """
+        """TODO: 현재 time slot에서 각 (end), edge, cloud에 대해서 idle computing resource를 self._network_performance_info에 저장한다."""
         # self._network_performance_info[0] -= 
         pass
     
     
-    def load_config(self, path):
+    def load_config(self, config_path=None):
         """TODO: path에 있는 파일에서 저장된 config value를 (layer별 time, energy) 불러와서 self._configs에 저장하고 power는 반환한다."""
         pass 
         return 
