@@ -8,6 +8,7 @@ from scheduling import Dijkstra
 
 import importlib
 import time
+import numpy as np
 
 class LayeredGraph:
     def __init__(self, network_info: NetworkInfo):
@@ -24,9 +25,13 @@ class LayeredGraph:
         self._max_layer_depth = 0
 
         self._dnn_models = DNNModels(self._network_info, "cpu")
+        
+        self._alpha = 0.5
+        self._expected_arrival_rate = 0
 
         self.init_graph()
         self.init_algorithm()
+        self.init_network_performance_info()
 
     def set_graph(self, links):
         self._previous_update_time = time.time()
@@ -152,13 +157,26 @@ class LayeredGraph:
 
     def init_algorithm(self):
         module_path = self._network_info.get_scheduling_algorithm().replace(".py", "").replace("/", ".")
-        self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path).Dijkstra()
-
+        self._algorithm_class = module_path.split(".")[-1]
+        # self._scheduling_algorithm: Dijkstra = importlib.import_module(module_path).Dijkstra()
+        self._scheduling_algorithm = getattr(importlib.import_module(module_path), self._algorithm_class)()
+        
     def schedule(self, source_ip: str, job_info: JobInfo):
         split_num = len(self._network_info.get_jobs()[job_info.get_job_name()]["split_points"])
         source_node = LayerNode(source_ip, 0)
         destination_node = LayerNode(job_info.get_terminal_destination(), split_num - 1)
-        path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
+
+        input_size = job_info.get_input_size()
+    
+        if self._algorithm_class == 'JDPCRA':
+            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes, self._dnn_models._yolo_computing_ratios, self._dnn_models._yolo_transfer_ratios, self._expected_arrival_rate, self._network_performance_info, input_size)
+        
+        elif self._algorithm_class == 'TLDOC':
+            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
+        
+        else:
+            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
+        
 
         return path
     
@@ -187,13 +205,29 @@ class LayeredGraph:
             source = path[i]
             destination = path[i + 1]
 
-            link = LayerNodePair(source = source,
-                                 destination = destination)
+            link = LayerNodePair(source = source, destination = destination)
             
             arrival_rate += self._layered_graph_backlog[link]
 
         return arrival_rate
 
-    
-    
+    def update_expected_arrival_rate(self, slot_arrival_rate):
+        """TODO: 이번 time slot에 들어온 job rate(slot_arrival_rate)(i.e., 강화학습이 처리한 프레임의 개수)를 기반으로 arrival rate를 계산한다.
+        """
+        self._expected_arrival_rate = self._alpha * self._expected_arrival_rate + (1-self._alpha) * slot_arrival_rate
+        
 
+    def init_network_performance_info(self):
+        """TODO: 각 (end), edge, cloud에 대해서 total computing resource를 self._network_performance_info에 저장한다.
+        """
+        computing_capacities = dict()
+        transmission_rates = dict()
+        
+        self._network_performance_info = (computing_capacities, transmission_rates)
+        
+        
+    def update_network_performance_info(self):
+        """TODO: 현재 time slot에서 각 (end), edge, cloud에 대해서 idle computing resource를 self._network_performance_info에 저장한다.
+        """
+        # self._network_performance_info[0] -= 
+        pass
