@@ -53,8 +53,6 @@ class JDPCRA:
     
     
     def _joint_adjust(self, computing_ratios, transfer_ratios, arrival_rate, network_info, partition_point, input_size):
-        
-
         task_requirements = self._make_requirement(computing_ratios, transfer_ratios, partition_point, input_size, arrival_rate)
         min_t, stability_info = cal_total_latency(arrival_rate, task_requirements, network_info)
         
@@ -81,14 +79,14 @@ class JDPCRA:
 
     
     def _make_requirement(self, computing_ratios, transfer_ratios, partition_point, input_size, arrival_rate):
-        """!TODO: requirements 계산방식 확인 (transfer 다 곱셈이 아니라 그냥 그 위치 하나만 곱셈맞는지, arrival rate 어떻게 할건지 확인 필요
         """
+        """
+        #!check: requirements 계산방식 확인 (transfer 다 곱셈이 아니라 그냥 그 위치 하나만 곱셈맞는지, arrival rate 어떻게 할건지 확인 필요
         computing_requirements = {
             'end': 0,
             'edge': arrival_rate * sum(computing_ratios[:partition_point]),
             'cloud': arrival_rate * sum(computing_ratios[partition_point:])
         }
-        #! check
         transfer_requirements = {
             'end': input_size * arrival_rate,
             'edge': input_size * arrival_rate * transfer_ratios[partition_point], 

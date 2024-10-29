@@ -11,10 +11,11 @@ class TLDOC:
         pass
     
     def init_parameter(self, time_config, energy_config, idle_power, transfer_ratios, scale=0.1, V=1.0, latency_allowed=0.5, default_rate=0.1):
-        """ TODO: 형태
+        """ config shape 
         time_config = {'end': List[각 레이어의 실행시간], 'edge': List[각 레이어의 실행시간], 'cloud': List[각 레이어의 실행시간]}
         energy_config = {'end': List[각 레이어의 소모에너지], 'end_to_edge': List[각 레이어 output을 end -> edge로 전송할 때 소모에너지]}
         """
+        #! check: hyperparameters
         self._scale = scale
         self._V = V
         self._latency_allowed = latency_allowed
@@ -27,11 +28,7 @@ class TLDOC:
         self._transfer_ratios = transfer_ratios
 
     def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, arrival_rate, network_info, input_size):
-        #! index 확인 
-        # input_size * transfer_ratios
-        # end_transfer = network_info[1]['end']
-        # edge_transfer = network_info[1]['edge']
-        data_size_list = [ input_size * arrival_rate * ratio for ratio in self._transfer_ratios ]
+        data_size_list = [ input_size * arrival_rate * ratio for ratio in self._transfer_ratios ] #! check: index 확인 
         max_layer = len(destination_node)
         off_tensor = self._lp_offloading(max_layer, network_info, data_size_list)
         partition_point_1, partition_point_2 = off_tensor[0], off_tensor[0]+off_tensor[1]
@@ -61,8 +58,6 @@ class TLDOC:
 
 
     def _create_new_off_tensor(self, off_tensor, network_info):
-        # edge-for-cloud -> end-edge-cloud
-        #! TODO: 아래와 같이 total_resource 써서 계산해도 제대로 된 값 나오는지 확인
         edge_resource = network_info[0]['edge']
         cloud_resource = network_info[0]['cloud']
         total_resource = edge_resource + cloud_resource

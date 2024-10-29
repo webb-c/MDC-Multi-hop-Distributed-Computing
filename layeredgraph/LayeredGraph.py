@@ -187,7 +187,6 @@ class LayeredGraph:
         else:
             path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes)
         
-
         return path
     
     # Method that return all layered grph's links of layer_node_ip.
