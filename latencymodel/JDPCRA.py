@@ -4,7 +4,7 @@ def cal_total_latency(arrival_rate, task_requirements, network_info):
     computing_requirements, transmission_requirements = task_requirements
     computing_capacities, transmission_rates = network_info
     computing_latency = _cal_computing_latency(computing_requirements['edge'], computing_requirements['cloud'], computing_capacities['edge'], computing_capacities['cloud'])
-    transmission_latency = _cal_transmission_latency(transmission_rates['edge'], transmission_rates['cloud'], transmission_requirements['edge'], transmission_requirements['cloud'])
+    transmission_latency = _cal_transmission_latency(transmission_rates['end'], transmission_rates['edge'], transmission_requirements['end'], transmission_requirements['edge'])
     queuing_latency, stability_info = _cal_queueing_latency(arrival_rate, computing_requirements['edge'], computing_requirements['cloud'], computing_capacities['edge'], computing_capacities['cloud'])
     total_latency = arrival_rate * (computing_latency + transmission_latency + queuing_latency)
     
@@ -19,11 +19,11 @@ def _cal_computing_latency(edge_computing, cloud_computing, edge_source, cloud_s
     return latency
 
 
-def _cal_transmission_latency(edge_trans_rate, cloud_trans_rate, edge_data_size, cloud_data_size):
-    edge_latency = edge_data_size / edge_trans_rate
-    cloud_latency = cloud_data_size / cloud_trans_rate
+def _cal_transmission_latency(end_trans_rate, edge_trans_rate, end_data_size, edge_data_size):
+    end_latency = end_data_size / end_trans_rate        # end -> edge 
+    edge_latency = edge_data_size / edge_trans_rate     # edge -> cloud
     
-    latency = edge_latency + cloud_latency
+    latency = end_latency + edge_latency
     return latency
 
 

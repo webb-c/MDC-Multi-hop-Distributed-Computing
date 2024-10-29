@@ -169,6 +169,9 @@ class LayeredGraph:
         input_size = job_info.get_input_size()
     
         if self._algorithm_class == 'JDPCRA':
+            # schedule을 호출할 때마다,
+            self.update_expected_arrival_rate()         # 1. self._expected_arrival_rate를 갱신
+            self.update_network_performance_info()      # 2. remaining computing resource를 구하여 self._network_performance_info에 저장
             path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes, self._dnn_models._yolo_computing_ratios, self._dnn_models._yolo_transfer_ratios, self._expected_arrival_rate, self._network_performance_info, input_size)
         
         elif self._algorithm_class == 'TLDOC':
@@ -211,14 +214,17 @@ class LayeredGraph:
 
         return arrival_rate
 
-    def update_expected_arrival_rate(self, slot_arrival_rate):
+    def update_expected_arrival_rate(self):
         """TODO: 이번 time slot에 들어온 job rate(slot_arrival_rate)(i.e., 강화학습이 처리한 프레임의 개수)를 기반으로 arrival rate를 계산한다.
         """
+        #!TODO: Controller가 slot_arrival_rate (실제 값)을 가져오는 코드 추가
+        slot_arrival_rate  = None
         self._expected_arrival_rate = self._alpha * self._expected_arrival_rate + (1-self._alpha) * slot_arrival_rate
         
 
     def init_network_performance_info(self):
         """TODO: 각 (end), edge, cloud에 대해서 total computing resource를 self._network_performance_info에 저장한다.
+        * format: computing_capacities = {'end':, 'edge':, 'cloud'}, transmission_rates = {'end':, 'edge':}
         """
         computing_capacities = dict()
         transmission_rates = dict()
