@@ -10,7 +10,7 @@ class TLDOC:
     def __init__(self):
         pass
     
-    def init_parameter(self, time_config, energy_config, idle_power, transfer_ratios, scale=0.1, V=1.0, latency_allowed=0.5, default_rate=0.1):
+    def init_parameter(self, time_config, energy_config, idle_power, transfer_ratios, scale=0.5, V=1.0, latency_allowed=25, default_rate=0.1):
         """ config shape 
         time_config = {'end': List[각 레이어의 실행시간], 'edge': List[각 레이어의 실행시간], 'cloud': List[각 레이어의 실행시간]}
         energy_config = {'end': List[각 레이어의 소모에너지], 'end_to_edge': List[각 레이어 output을 end -> edge로 전송할 때 소모에너지]}
