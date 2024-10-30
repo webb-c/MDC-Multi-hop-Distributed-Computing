@@ -29,7 +29,7 @@ class TLDOC:
 
     def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, arrival_rate, network_info, input_size):
         data_size_list = [ input_size * arrival_rate * ratio for ratio in self._transfer_ratios ] #! check: index 확인 
-        max_layer = len(destination_node)
+        max_layer = len(self._transfer_ratios) - 1  # 4개
         off_tensor = self._lp_offloading(max_layer, network_info, data_size_list)
         partition_point_1, partition_point_2 = off_tensor[0], off_tensor[0]+off_tensor[1]
         path = self._make_path(source_node, destination_node, layered_graph, partition_point_1, partition_point_2)
