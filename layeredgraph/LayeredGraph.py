@@ -174,7 +174,7 @@ class LayeredGraph:
             # schedule을 호출할 때마다,
             self.update_expected_arrival_rate()         # 1. self._expected_arrival_rate를 갱신
             self.update_network_performance_info()      # 2. remaining computing resource를 구하여 self._network_performance_info에 저장
-            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._layered_graph_backlog, self._layer_nodes, self._dnn_models._yolo_computing_ratios, self._dnn_models._yolo_transfer_ratios, self._expected_arrival_rate, self._network_performance_info, input_size)
+            path = self._scheduling_algorithm.get_path(source_node, destination_node, self._layered_graph, self._dnn_models._yolo_computing_ratios, self._dnn_models._yolo_transfer_ratios, self._expected_arrival_rate, self._network_performance_info, input_size)
         
         elif self._algorithm_class == 'TLDOC':
             if self._configs is None:

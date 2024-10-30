@@ -10,7 +10,7 @@ class JDPCRA:
     def __init__(self):
         pass
 
-    def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, layered_graph_backlog, layer_nodes, computing_ratios, transfer_ratios, arrival_rate, network_info, input_size):
+    def get_path(self, source_node: LayerNode, destination_node: LayerNode, layered_graph, computing_ratios, transfer_ratios, arrival_rate, network_info, input_size):
         edge_computing_resource = network_info[0]["edge"]
         computing_order, transfer_order = self._cal_order(computing_ratios, transfer_ratios, arrival_rate)
         partition_point = self._init_BS(computing_ratios, computing_order, transfer_order, arrival_rate, edge_computing_resource)
@@ -56,7 +56,7 @@ class JDPCRA:
         task_requirements = self._make_requirement(computing_ratios, transfer_ratios, partition_point, input_size, arrival_rate)
         min_t, stability_info = cal_total_latency(arrival_rate, task_requirements, network_info)
         
-        for s in range(len(computing_ratios)):
+        for s in range(len(computing_ratios)):  # len: 5. range(5): [0, 1, 2, 3, 4]
             temp_task_requirements = self._make_requirement(computing_ratios, transfer_ratios, s, input_size, arrival_rate)
             temp_t, temp_stability_info = cal_total_latency(arrival_rate, temp_task_requirements, network_info)
             if temp_stability_info[0] <= 1 and temp_stability_info[1] <= 1:
@@ -79,9 +79,6 @@ class JDPCRA:
 
     
     def _make_requirement(self, computing_ratios, transfer_ratios, partition_point, input_size, arrival_rate):
-        """
-        """
-        #!check: requirements 계산방식 확인 (transfer 다 곱셈이 아니라 그냥 그 위치 하나만 곱셈맞는지, arrival rate 어떻게 할건지 확인 필요
         computing_requirements = {
             'end': 0,
             'edge': arrival_rate * sum(computing_ratios[:partition_point]),
